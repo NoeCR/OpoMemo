@@ -9,6 +9,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 ### Added
 - Modelo de hecho: tipo (término / pregunta / hueco), texto con hueco `{{dato}}` y distractores.
 - Mazo atómico **LPACAP · Plazos** (hechos cortos citados al artículo; listo para Huecos más adelante).
+- Mazo atómico **CE · Órganos** (Corona, Cortes, Gobierno, justicia y Tribunal Constitucional).
 
 ---
 

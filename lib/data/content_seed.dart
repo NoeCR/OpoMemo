@@ -4,8 +4,9 @@ import 'package:flutter/services.dart';
 
 import '../models/deck.dart';
 import '../models/fact.dart';
-import 'memo_repository.dart';
+import 'ce_organos_seed.dart';
 import 'lpacap_plazos_seed.dart';
+import 'memo_repository.dart';
 import 'pilot_seed.dart';
 
 abstract final class ContentSeed {
@@ -14,6 +15,7 @@ abstract final class ContentSeed {
   static Future<void> ensure(MemoRepository repo, {String? jsonText}) async {
     await PilotSeed.ensure(repo);
     await LpacapPlazosSeed.ensure(repo);
+    await CeOrganosSeed.ensure(repo);
     final raw = jsonText ?? await rootBundle.loadString(assetPath);
     final payload = jsonDecode(raw) as Map<String, dynamic>;
     final decks = payload['decks'] as List<dynamic>? ?? const [];

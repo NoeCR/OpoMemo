@@ -42,7 +42,7 @@ Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clo
 
 Las 1.048 cartas actuales salen de tests de 4 opciones (enunciado → opción correcta). Sirven para probar el volteo; no son un mazo Anki. Tres capas:
 
-- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, puertos). Oro para Huecos y Relacionar. En **Unreleased**: mazo LPACAP · Plazos.
+- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, puertos). Oro para Huecos y Relacionar. En **Unreleased**: mazos LPACAP · Plazos y CE · Órganos.
 - **B · Importada limpia** — reextraer OpoTest con distractores y artículo; no borrar el SRS de ids `opotest.q.*`.
 - **C · Volumen** — resto de leyes e importador JSON. Cuando el hábito diario exista.
 

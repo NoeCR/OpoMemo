@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:opomemo/data/ce_organos_seed.dart';
 import 'package:opomemo/data/content_seed.dart';
 import 'package:opomemo/data/lpacap_plazos_seed.dart';
 import 'package:opomemo/data/memo_repository.dart';
@@ -39,5 +40,8 @@ void main() {
     final plazos = summaries.firstWhere((item) => item.deck.id == LpacapPlazosSeed.deckId);
     expect(plazos.factCount, greaterThanOrEqualTo(30));
     expect(plazos.deck.groupName, 'Ley 39/2015 · Procedimiento');
+    final organos = summaries.firstWhere((item) => item.deck.id == CeOrganosSeed.deckId);
+    expect(organos.factCount, greaterThanOrEqualTo(30));
+    expect(organos.deck.groupName, 'Constitución Española');
   });
 }

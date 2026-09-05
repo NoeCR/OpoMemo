@@ -1,0 +1,325 @@
+import '../models/deck.dart';
+import '../models/fact.dart';
+import 'memo_repository.dart';
+
+/// Órganos constitucionales. Citas del BOE-A-1978-31229 (texto consolidado).
+abstract final class CeOrganosSeed {
+  static const deckId = 'atomic.ce.organos';
+
+  static Future<void> ensure(MemoRepository repo) async {
+    await repo.seedDeck(
+      id: deckId,
+      name: 'CE · Órganos',
+      description: 'Corona, Cortes, Gobierno, justicia y TC. Hechos cortos citados al artículo.',
+      domain: DeckDomain.leyes,
+      groupName: 'Constitución Española',
+      facts: _facts,
+    );
+  }
+
+  static SeedFact _item({
+    required String id,
+    required String prompt,
+    required String answer,
+    required String article,
+    FactKind kind = FactKind.termino,
+    String? cloze,
+    List<String> distractors = const [],
+  }) {
+    return SeedFact(
+      id: '$deckId.$id',
+      prompt: prompt,
+      answer: answer,
+      source: 'CE art. $article',
+      kind: kind,
+      clozeText: cloze ?? '',
+      distractors: distractors,
+    );
+  }
+
+  static final _facts = <SeedFact>[
+    _item(
+      id: '56-1-rey',
+      prompt: 'El Rey es, según el artículo 56',
+      answer: 'Jefe del Estado, símbolo de su unidad y permanencia',
+      article: '56.1',
+    ),
+    _item(
+      id: '56-3-inviolable',
+      prompt: 'La persona del Rey, respecto de la responsabilidad',
+      answer: 'Es inviolable y no está sujeta a responsabilidad',
+      article: '56.3',
+    ),
+    _item(
+      id: '64-1-refrendo',
+      prompt: 'Quién refrenda los actos del Rey, con carácter general',
+      answer: 'El Presidente del Gobierno y, en su caso, los Ministros competentes',
+      article: '64.1',
+    ),
+    _item(
+      id: '64-1-congreso',
+      prompt: 'Quién refrenda la propuesta y el nombramiento del Presidente del Gobierno y la disolución del art. 99',
+      answer: 'El Presidente del Congreso',
+      article: '64.1',
+    ),
+    _item(
+      id: '62-d-candidato',
+      prompt: 'A quién corresponde proponer el candidato a Presidente del Gobierno y nombrarlo',
+      answer: 'Al Rey, en los términos de la Constitución',
+      article: '62.d',
+    ),
+    _item(
+      id: '66-1-cortes',
+      prompt: 'De qué están formadas las Cortes Generales',
+      answer: 'Congreso de los Diputados y Senado',
+      article: '66.1',
+      kind: FactKind.hueco,
+      cloze: 'Las Cortes Generales están formadas por el {{Congreso de los Diputados}} y el {{Senado}}.',
+    ),
+    _item(
+      id: '66-2-funciones',
+      prompt: 'Tres funciones de las Cortes Generales',
+      answer: 'Potestad legislativa, aprobar los Presupuestos y controlar al Gobierno',
+      article: '66.2',
+    ),
+    _item(
+      id: '68-1-diputados',
+      prompt: 'Composición del Congreso de los Diputados',
+      answer: 'Mínimo 300 y máximo 400 Diputados',
+      article: '68.1',
+      kind: FactKind.hueco,
+      cloze: 'El Congreso se compone de un mínimo de {{300}} y un máximo de {{400}} Diputados.',
+      distractors: const ['350 fijos', '200 a 300'],
+    ),
+    _item(
+      id: '68-2-circunscripcion',
+      prompt: 'Circunscripción electoral del Congreso',
+      answer: 'La provincia; Ceuta y Melilla, un Diputado cada una',
+      article: '68.2',
+    ),
+    _item(
+      id: '68-4-mandato',
+      prompt: 'Duración del mandato del Congreso',
+      answer: '4 años',
+      article: '68.4',
+      kind: FactKind.hueco,
+      cloze: 'El Congreso es elegido por {{cuatro años}}.',
+    ),
+    _item(
+      id: '69-1-senado',
+      prompt: 'El Senado es la Cámara de',
+      answer: 'Representación territorial',
+      article: '69.1',
+      kind: FactKind.hueco,
+      cloze: 'El Senado es la Cámara de {{representación territorial}}.',
+    ),
+    _item(
+      id: '69-2-provincia',
+      prompt: 'Senadores electos por provincia (sufragio directo)',
+      answer: '4 por provincia',
+      article: '69.2',
+      kind: FactKind.hueco,
+      cloze: 'En cada provincia se elegirán {{cuatro}} Senadores.',
+    ),
+    _item(
+      id: '69-4-ceuta',
+      prompt: 'Senadores de Ceuta y de Melilla',
+      answer: '2 cada una',
+      article: '69.4',
+      kind: FactKind.hueco,
+      cloze: 'Ceuta y Melilla eligen cada una {{dos}} Senadores.',
+    ),
+    _item(
+      id: '69-5-ccaa',
+      prompt: 'Senadores designados por cada Comunidad Autónoma',
+      answer: 'Uno, y otro más por cada millón de habitantes',
+      article: '69.5',
+    ),
+    _item(
+      id: '72-2-mesa',
+      prompt: 'Quién preside las sesiones conjuntas de las Cortes',
+      answer: 'El Presidente del Congreso',
+      article: '72.2',
+    ),
+    _item(
+      id: '73-1-periodos',
+      prompt: 'Períodos ordinarios de sesiones de las Cámaras',
+      answer: 'Septiembre a diciembre, y febrero a junio',
+      article: '73.1',
+    ),
+    _item(
+      id: '78-1-permanente',
+      prompt: 'Composición mínima de la Diputación Permanente de cada Cámara',
+      answer: '21 miembros, en proporción a los grupos parlamentarios',
+      article: '78.1',
+      kind: FactKind.hueco,
+      cloze: 'La Diputación Permanente se compone de un mínimo de {{veintiún}} miembros.',
+    ),
+    _item(
+      id: '87-1-iniciativa',
+      prompt: 'A quién corresponde la iniciativa legislativa',
+      answer: 'Al Gobierno, al Congreso y al Senado',
+      article: '87.1',
+    ),
+    _item(
+      id: '87-3-popular',
+      prompt: 'Firmas mínimas de la iniciativa legislativa popular',
+      answer: '500.000 firmas acreditadas',
+      article: '87.3',
+      kind: FactKind.hueco,
+      cloze: 'La iniciativa popular exige no menos de {{500.000}} firmas acreditadas.',
+    ),
+    _item(
+      id: '97-gobierno',
+      prompt: 'Qué dirige el Gobierno',
+      answer: 'La política interior y exterior, la Administración civil y militar y la defensa del Estado',
+      article: '97',
+    ),
+    _item(
+      id: '98-1-composicion',
+      prompt: 'De quién se compone el Gobierno',
+      answer: 'Presidente, Vicepresidentes en su caso, Ministros y los demás miembros que establezca la ley',
+      article: '98.1',
+    ),
+    _item(
+      id: '99-3-investidura',
+      prompt: 'Mayoría de la primera votación de investidura',
+      answer: 'Mayoría absoluta; si no, mayoría simple 48 horas después',
+      article: '99.3',
+    ),
+    _item(
+      id: '99-5-disolucion',
+      prompt: 'Si en dos meses desde la primera investidura nadie obtiene la confianza',
+      answer: 'El Rey disuelve ambas Cámaras y convoca elecciones (refrendo del Presidente del Congreso)',
+      article: '99.5',
+    ),
+    _item(
+      id: '101-1-cese',
+      prompt: 'Cuándo cesa el Gobierno',
+      answer: 'Tras elecciones generales, pérdida de confianza, o dimisión o fallecimiento del Presidente',
+      article: '101.1',
+    ),
+    _item(
+      id: '107-estado',
+      prompt: 'El Consejo de Estado es',
+      answer: 'El supremo órgano consultivo del Gobierno',
+      article: '107',
+      kind: FactKind.hueco,
+      cloze: 'El Consejo de Estado es el supremo órgano {{consultivo}} del Gobierno.',
+    ),
+    _item(
+      id: '108-solidaria',
+      prompt: 'Ante quién responde el Gobierno de su gestión política',
+      answer: 'Ante el Congreso de los Diputados, de forma solidaria',
+      article: '108',
+    ),
+    _item(
+      id: '113-1-censura',
+      prompt: 'Mayoría para la moción de censura',
+      answer: 'Mayoría absoluta del Congreso',
+      article: '113.1',
+      kind: FactKind.hueco,
+      cloze: 'La moción de censura se adopta por {{mayoría absoluta}}.',
+    ),
+    _item(
+      id: '113-2-propuesta',
+      prompt: 'Quién puede proponer la moción de censura y qué debe incluir',
+      answer: 'Al menos la décima parte de los Diputados, e incluir un candidato a Presidente',
+      article: '113.2',
+    ),
+    _item(
+      id: '113-3-plazo',
+      prompt: 'Cuándo se vota la moción de censura',
+      answer: 'No hasta que transcurran cinco días desde su presentación',
+      article: '113.3',
+      kind: FactKind.hueco,
+      cloze: 'La moción de censura no podrá ser votada hasta que transcurran {{cinco días}} desde su presentación.',
+    ),
+    _item(
+      id: '117-1-justicia',
+      prompt: 'Quién administra la justicia y en nombre de quién',
+      answer: 'Jueces y Magistrados, independientes e inamovibles, en nombre del Rey',
+      article: '117.1',
+    ),
+    _item(
+      id: '122-2-cgpj',
+      prompt: 'El Consejo General del Poder Judicial es',
+      answer: 'El órgano de gobierno del poder judicial',
+      article: '122.2',
+    ),
+    _item(
+      id: '122-3-composicion',
+      prompt: 'Composición del CGPJ',
+      answer: 'Presidente del TS (que lo preside) y 20 miembros nombrados por el Rey por 5 años',
+      article: '122.3',
+      kind: FactKind.hueco,
+      cloze: 'El CGPJ lo integran el Presidente del TS y {{veinte}} miembros nombrados por el Rey por {{cinco años}}.',
+    ),
+    _item(
+      id: '123-1-ts',
+      prompt: 'El Tribunal Supremo es',
+      answer: 'El órgano jurisdiccional superior en todos los órdenes, salvo garantías constitucionales',
+      article: '123.1',
+    ),
+    _item(
+      id: '124-4-fge',
+      prompt: 'Quién nombra al Fiscal General del Estado',
+      answer: 'El Rey, a propuesta del Gobierno, oído el CGPJ',
+      article: '124.4',
+    ),
+    _item(
+      id: '136-1-cuentas',
+      prompt: 'El Tribunal de Cuentas es',
+      answer: 'El supremo órgano fiscalizador de las cuentas y de la gestión económica del Estado y del sector público',
+      article: '136.1',
+    ),
+    _item(
+      id: '136-1-depende',
+      prompt: 'De quién depende el Tribunal de Cuentas',
+      answer: 'De las Cortes Generales, y fiscaliza por delegación de ellas',
+      article: '136.1',
+    ),
+    _item(
+      id: '54-defensor',
+      prompt: 'El Defensor del Pueblo es',
+      answer: 'Alto comisionado de las Cortes Generales para la defensa de los derechos del Título I',
+      article: '54',
+    ),
+    _item(
+      id: '159-1-tc',
+      prompt: 'Composición del Tribunal Constitucional',
+      answer: '12 miembros nombrados por el Rey: 4 Congreso, 4 Senado, 2 Gobierno, 2 CGPJ',
+      article: '159.1',
+      kind: FactKind.hueco,
+      cloze: 'El TC se compone de {{12}} miembros: {{4}} a propuesta del Congreso, {{4}} del Senado, {{2}} del Gobierno y {{2}} del CGPJ.',
+    ),
+    _item(
+      id: '159-3-mandato',
+      prompt: 'Mandato de los miembros del Tribunal Constitucional',
+      answer: '9 años, renovados por terceras partes cada 3',
+      article: '159.3',
+      kind: FactKind.hueco,
+      cloze: 'Los miembros del TC se designan por {{nueve años}} y se renuevan por terceras partes cada {{tres}}.',
+    ),
+    _item(
+      id: '160-presidente',
+      prompt: 'Mandato del Presidente del Tribunal Constitucional',
+      answer: '3 años, nombrado por el Rey a propuesta del Pleno',
+      article: '160',
+      kind: FactKind.hueco,
+      cloze: 'El Presidente del TC se nombra por un período de {{tres años}}.',
+    ),
+    _item(
+      id: '162-1-inconstitucionalidad',
+      prompt: 'Quién está legitimado para el recurso de inconstitucionalidad',
+      answer: 'Presidente del Gobierno, Defensor del Pueblo, 50 Diputados, 50 Senadores, ejecutivos autonómicos y, en su caso, sus Asambleas',
+      article: '162.1.a',
+    ),
+    _item(
+      id: '164-1-sentencias',
+      prompt: 'Efectos de las sentencias del Tribunal Constitucional',
+      answer: 'Cosa juzgada desde el día siguiente a su publicación en el BOE; no cabe recurso',
+      article: '164.1',
+    ),
+  ];
+}
