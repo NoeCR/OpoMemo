@@ -18,6 +18,8 @@ enum DeckDomain {
 }
 
 class Deck {
+  static const defaultGroup = 'Mis mazos';
+
   const Deck({
     required this.id,
     required this.name,
@@ -90,11 +92,25 @@ class DeckSummary {
     required this.deck,
     required this.factCount,
     required this.dueCount,
+    this.newCount = 0,
+    this.boxCounts = const [0, 0, 0, 0, 0],
+    this.flaggedCount = 0,
   });
 
   final Deck deck;
   final int factCount;
   final int dueCount;
+  final int newCount;
+  final List<int> boxCounts;
+  final int flaggedCount;
+
+  bool matches(String query) {
+    final needle = query.trim().toLowerCase();
+    if (needle.isEmpty) return true;
+    return deck.name.toLowerCase().contains(needle) ||
+        deck.description.toLowerCase().contains(needle) ||
+        deck.groupName.toLowerCase().contains(needle);
+  }
 }
 
 class DeckGroup {

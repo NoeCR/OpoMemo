@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../models/deck.dart';
 import '../state/memo_controller.dart';
+import '../widgets/leitner_strip.dart';
+import '../widgets/memo_search_field.dart';
 import '../widgets/page_frame.dart';
 import 'deck_form_screen.dart';
 import 'deck_screen.dart';
@@ -17,19 +19,29 @@ class HubScreen extends StatefulWidget {
 
 class _HubScreenState extends State<HubScreen> {
   String? _group;
+  var _query = '';
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MemoController>();
     final groups = [
       for (final group in controller.groups)
-        if (_group == null || group.name == _group) group,
-    ];
+        if (_group == null || group.name == _group)
+          DeckGroup(
+            name: group.name,
+            decks: [
+              for (final summary in group.decks)
+                if (summary.matches(_query)) summary,
+            ],
+          ),
+    ].where((group) => group.decks.isNotEmpty).toList();
     return Scaffold(
       appBar: AppBar(title: const Text('Tarjetas')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => const DeckFormScreen()),
+          MaterialPageRoute<void>(
+            builder: (_) => DeckFormScreen(initialGroup: _group),
+          ),
         ),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo mazo'),
@@ -45,6 +57,11 @@ class _HubScreenState extends State<HubScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
                       children: [
+                        MemoSearchField(
+                          hint: 'Buscar mazo o grupo',
+                          onChanged: (value) => setState(() => _query = value),
+                        ),
+                        const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -68,9 +85,15 @@ class _HubScreenState extends State<HubScreen> {
                         ),
                         const SizedBox(height: 16),
                         if (groups.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 48),
-                            child: Center(child: Text('Crea un mazo para empezar.')),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 48),
+                            child: Center(
+                              child: Text(
+                                _query.trim().isEmpty
+                                    ? 'Crea un mazo para empezar.'
+                                    : 'Ningún mazo coincide con la búsqueda.',
+                              ),
+                            ),
                           )
                         else
                           for (final group in groups) ...[
@@ -160,6 +183,15 @@ class _GroupHeader extends StatelessWidget {
             color: Colors.black.withValues(alpha: 0.45),
           ),
         ),
+        IconButton(
+          tooltip: 'Nuevo mazo en ${group.name}',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => DeckFormScreen(initialGroup: group.name),
+            ),
+          ),
+          icon: const Icon(Icons.add),
+        ),
       ],
     );
   }
@@ -202,10 +234,17 @@ class _DeckTile extends StatelessWidget {
                         if (deck.description.isNotEmpty) deck.description,
                         '${summary.factCount} cartas',
                         due == 0 ? 'al día' : '$due pendientes',
+                        if (summary.flaggedCount > 0) '${summary.flaggedCount} marcadas',
                       ].join(' · '),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                    ),
+                    const SizedBox(height: 8),
+                    LeitnerStrip(
+                      newCount: summary.newCount,
+                      boxCounts: summary.boxCounts,
+                      compact: true,
                     ),
                   ],
                 ),

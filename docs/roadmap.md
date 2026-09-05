@@ -2,7 +2,7 @@
 
 Documento de trabajo. Criterio: **no abrir un modo nuevo hasta que el bucle de tarjetas se use varios días**. Relacionar y Huecos fallan si la carta es un enunciado de test largo. Un hecho alimenta todos los modos.
 
-Versión actual: **0.1.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
+Versión actual: **0.2.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
 
 ## Orden de valor
 
@@ -22,11 +22,11 @@ Hecho en **0.1.0**: repaso del día, atajos, deshacer/saltar, tamaño de sesión
 
 ### P1 · listado y lectura
 
-Distribución por caja Leitner, búsqueda en mazos y cartas, toggle anverso/reverso, marcar carta para editar luego.
+Hecho en **0.2.0**: distribución por caja Leitner, búsqueda en mazos y cartas, toggle anverso/reverso, marcar carta y crear o mover mazos entre secciones.
 
 ### P2 · confort
 
-Tema oscuro, recordar ventana en escritorio, chips de filtro cortos (CE, LPACAP, TREBEP).
+Tema oscuro, recordar ventana en escritorio, chips de filtro cortos (CE, LPACAP, TREBEP). En **0.2.0**: crear o mover mazos entre secciones.
 
 ## Modos anunciados (Próximamente)
 
@@ -36,13 +36,13 @@ Tema oscuro, recordar ventana en escritorio, chips de filtro cortos (CE, LPACAP,
 | Relacionar | 3.º | Hechos cortos término ↔ definición. Toque-toque, no flechas. |
 | Verdadero / falso | 4.º | Distractores de OpoTest o trampas redactadas a mano. |
 
-Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Match adelanta el due en tarjetas.
+Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Match adelanta el due en tarjetas. En **Unreleased** el contrato ya está en el modelo; Huecos y Relacionar siguen cerrados.
 
 ## Contenido
 
 Las 1.048 cartas actuales salen de tests de 4 opciones (enunciado → opción correcta). Sirven para probar el volteo; no son un mazo Anki. Tres capas:
 
-- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, puertos). Oro para Huecos y Relacionar.
+- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, puertos). Oro para Huecos y Relacionar. En **Unreleased**: mazo LPACAP · Plazos.
 - **B · Importada limpia** — reextraer OpoTest con distractores y artículo; no borrar el SRS de ids `opotest.q.*`.
 - **C · Volumen** — resto de leyes e importador JSON. Cuando el hábito diario exista.
 

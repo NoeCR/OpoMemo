@@ -9,7 +9,7 @@ class AppDatabase {
   AppDatabase(this._db);
 
   static const _fileName = 'opomemo.db';
-  static const schemaVersion = 2;
+  static const schemaVersion = 4;
   final Database _db;
 
   Database get db => _db;
@@ -61,6 +61,10 @@ class AppDatabase {
         prompt TEXT NOT NULL,
         answer TEXT NOT NULL,
         source TEXT NOT NULL DEFAULT '',
+        kind TEXT NOT NULL DEFAULT 'pregunta',
+        cloze_text TEXT NOT NULL DEFAULT '',
+        distractors TEXT NOT NULL DEFAULT '[]',
+        flagged INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
@@ -84,6 +88,14 @@ class AppDatabase {
     if (from < 2) {
       await db.execute("ALTER TABLE decks ADD COLUMN group_name TEXT NOT NULL DEFAULT ''");
       await db.execute("ALTER TABLE decks ADD COLUMN source TEXT NOT NULL DEFAULT 'user'");
+    }
+    if (from < 3) {
+      await db.execute('ALTER TABLE facts ADD COLUMN flagged INTEGER NOT NULL DEFAULT 0');
+    }
+    if (from < 4) {
+      await db.execute("ALTER TABLE facts ADD COLUMN kind TEXT NOT NULL DEFAULT 'pregunta'");
+      await db.execute("ALTER TABLE facts ADD COLUMN cloze_text TEXT NOT NULL DEFAULT ''");
+      await db.execute("ALTER TABLE facts ADD COLUMN distractors TEXT NOT NULL DEFAULT '[]'");
     }
   }
 

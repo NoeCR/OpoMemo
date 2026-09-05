@@ -18,12 +18,27 @@ class MemoController extends ChangeNotifier {
   List<DeckGroup> get groups {
     final buckets = <String, List<DeckSummary>>{};
     for (final summary in summaries) {
-      final name = summary.deck.groupName.trim().isEmpty ? 'Mis mazos' : summary.deck.groupName;
+      final name = summary.deck.groupName.trim().isEmpty ? Deck.defaultGroup : summary.deck.groupName;
       buckets.putIfAbsent(name, () => []).add(summary);
     }
     return [
       for (final entry in buckets.entries) DeckGroup(name: entry.key, decks: entry.value),
     ];
+  }
+
+  List<String> get groupNames {
+    final seen = <String>{};
+    final names = <String>[];
+    void add(String raw) {
+      final name = raw.trim().isEmpty ? Deck.defaultGroup : raw.trim();
+      if (seen.add(name)) names.add(name);
+    }
+
+    add(Deck.defaultGroup);
+    for (final group in groups) {
+      add(group.name);
+    }
+    return names;
   }
 
   Future<void> bootstrap({String? seedJson}) async {
@@ -50,7 +65,7 @@ class MemoController extends ChangeNotifier {
     required String name,
     required String description,
     required DeckDomain domain,
-    String groupName = 'Mis mazos',
+    String groupName = Deck.defaultGroup,
   }) async {
     final deck = await _repo.createDeck(
       name: name,
@@ -81,12 +96,18 @@ class MemoController extends ChangeNotifier {
     required String prompt,
     required String answer,
     String source = '',
+    FactKind kind = FactKind.pregunta,
+    String clozeText = '',
+    List<String> distractors = const [],
   }) async {
     final fact = await _repo.createFact(
       deckId: deckId,
       prompt: prompt,
       answer: answer,
       source: source,
+      kind: kind,
+      clozeText: clozeText,
+      distractors: distractors,
     );
     await reload();
     return fact;
@@ -117,5 +138,10 @@ class MemoController extends ChangeNotifier {
 
   Future<void> restoreReview(String factId, ReviewState? previous) {
     return _repo.restoreReview(factId, previous);
+  }
+
+  Future<void> setFlagged(String factId, bool flagged) async {
+    await _repo.setFlagged(factId, flagged);
+    await reload();
   }
 }

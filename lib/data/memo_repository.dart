@@ -30,7 +30,18 @@ class MemoRepository {
           LEFT JOIN review_states r ON r.fact_id = f.id
           WHERE f.deck_id = d.id
             AND (r.fact_id IS NULL OR r.next_due <= ?)
-        ) AS due_count
+        ) AS due_count,
+        (
+          SELECT COUNT(*) FROM facts f
+          LEFT JOIN review_states r ON r.fact_id = f.id
+          WHERE f.deck_id = d.id AND r.fact_id IS NULL
+        ) AS new_count,
+        (SELECT COUNT(*) FROM facts f JOIN review_states r ON r.fact_id = f.id WHERE f.deck_id = d.id AND r.box = 1) AS box1,
+        (SELECT COUNT(*) FROM facts f JOIN review_states r ON r.fact_id = f.id WHERE f.deck_id = d.id AND r.box = 2) AS box2,
+        (SELECT COUNT(*) FROM facts f JOIN review_states r ON r.fact_id = f.id WHERE f.deck_id = d.id AND r.box = 3) AS box3,
+        (SELECT COUNT(*) FROM facts f JOIN review_states r ON r.fact_id = f.id WHERE f.deck_id = d.id AND r.box = 4) AS box4,
+        (SELECT COUNT(*) FROM facts f JOIN review_states r ON r.fact_id = f.id WHERE f.deck_id = d.id AND r.box = 5) AS box5,
+        (SELECT COUNT(*) FROM facts f WHERE f.deck_id = d.id AND f.flagged = 1) AS flagged_count
       FROM decks d
       ORDER BY d.group_name ASC, d.name ASC
     ''', [dueDay]);
@@ -39,11 +50,26 @@ class MemoRepository {
         .map(
           (row) => DeckSummary(
             deck: Deck.fromMap(row),
-            factCount: row['fact_count'] as int? ?? 0,
-            dueCount: row['due_count'] as int? ?? 0,
+            factCount: _asInt(row['fact_count']),
+            dueCount: _asInt(row['due_count']),
+            newCount: _asInt(row['new_count']),
+            boxCounts: [
+              _asInt(row['box1']),
+              _asInt(row['box2']),
+              _asInt(row['box3']),
+              _asInt(row['box4']),
+              _asInt(row['box5']),
+            ],
+            flaggedCount: _asInt(row['flagged_count']),
           ),
         )
         .toList();
+  }
+
+  static int _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse('$value') ?? 0;
   }
 
   Future<Deck?> deckById(String id) async {
@@ -61,7 +87,7 @@ class MemoRepository {
     required String name,
     required String description,
     required DeckDomain domain,
-    String groupName = 'Mis mazos',
+    String groupName = Deck.defaultGroup,
     String source = 'user',
     String? id,
   }) async {
@@ -71,7 +97,7 @@ class MemoRepository {
       name: name.trim(),
       description: description.trim(),
       domain: domain,
-      groupName: groupName.trim().isEmpty ? 'Mis mazos' : groupName.trim(),
+      groupName: groupName.trim().isEmpty ? Deck.defaultGroup : groupName.trim(),
       source: source,
       createdAt: now,
       updatedAt: now,
@@ -109,6 +135,9 @@ class MemoRepository {
     required String prompt,
     required String answer,
     String source = '',
+    FactKind kind = FactKind.pregunta,
+    String clozeText = '',
+    List<String> distractors = const [],
     String? id,
   }) async {
     final now = _clock();
@@ -118,6 +147,10 @@ class MemoRepository {
       prompt: prompt.trim(),
       answer: answer.trim(),
       source: source.trim(),
+      kind: kind,
+      clozeText: clozeText.trim(),
+      distractors: distractors,
+      flagged: false,
       createdAt: now,
       updatedAt: now,
     );
@@ -132,7 +165,7 @@ class MemoRepository {
     required String description,
     required DeckDomain domain,
     required String groupName,
-    required List<({String id, String prompt, String answer, String source})> facts,
+    required List<SeedFact> facts,
   }) async {
     final existing = await deckById(id);
     if (existing == null) {
@@ -150,7 +183,6 @@ class MemoRepository {
           name: name,
           description: description,
           domain: domain,
-          groupName: groupName,
           source: 'seed',
         ),
       );
@@ -162,6 +194,10 @@ class MemoRepository {
         prompt: item.prompt,
         answer: item.answer,
         source: item.source,
+        kind: item.kind,
+        clozeText: item.clozeText,
+        distractors: item.distractors,
+        flagged: false,
         createdAt: _clock(),
         updatedAt: _clock(),
       );
@@ -246,6 +282,15 @@ class MemoRepository {
       'review_states',
       previous.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> setFlagged(String factId, bool flagged) async {
+    await _database.db.update(
+      'facts',
+      {'flagged': flagged ? 1 : 0, 'updated_at': _nowIso},
+      where: 'id = ?',
+      whereArgs: [factId],
     );
   }
 

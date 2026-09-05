@@ -1,4 +1,5 @@
 import '../models/deck.dart';
+import '../models/fact.dart';
 import 'memo_repository.dart';
 
 abstract final class PilotSeed {
@@ -13,7 +14,13 @@ abstract final class PilotSeed {
       groupName: 'Informática',
       facts: [
         for (final item in _facts)
-          (id: item.$1, prompt: item.$2, answer: item.$3, source: item.$4),
+          SeedFact(
+            id: item.$1,
+            prompt: item.$2,
+            answer: item.$3,
+            source: item.$4,
+            kind: FactKind.termino,
+          ),
       ],
     );
   }

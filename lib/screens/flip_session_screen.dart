@@ -167,6 +167,28 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
     _keepFocus();
   }
 
+  void _toggleReversed() {
+    if (_done) return;
+    final settings = context.read<SessionSettings>();
+    settings.setReversed(!settings.reversed);
+    _keepFocus();
+  }
+
+  Future<void> _toggleFlag() async {
+    if (_done || _grading || _queue.isEmpty) return;
+    final fact = _queue[_index];
+    final next = !fact.flagged;
+    await context.read<MemoController>().setFlagged(fact.id, next);
+    if (!mounted) return;
+    setState(() {
+      _queue = [
+        for (final item in _queue)
+          if (item.id == fact.id) item.copyWith(flagged: next) else item,
+      ];
+    });
+    _keepFocus();
+  }
+
   String? _deckLabel(Fact fact) {
     if (!_daily) return null;
     for (final summary in context.read<MemoController>().summaries) {
@@ -183,6 +205,8 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    final reversed = context.watch<SessionSettings>().reversed;
+    final flagged = !_done && _queue.isNotEmpty && _queue[_index].flagged;
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.space): _toggleFlip,
@@ -195,6 +219,8 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
         const SingleActivator(LogicalKeyboardKey.keyS): _skip,
         const SingleActivator(LogicalKeyboardKey.keyZ): _undo,
         const SingleActivator(LogicalKeyboardKey.keyZ, control: true): _undo,
+        const SingleActivator(LogicalKeyboardKey.keyB): _toggleFlag,
+        const SingleActivator(LogicalKeyboardKey.keyR): _toggleReversed,
         const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.maybePop(context),
       },
       child: Focus(
@@ -204,6 +230,25 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
           appBar: AppBar(
             title: Text(_done ? 'Sesión terminada' : '${_index + 1} / ${_queue.length}'),
             actions: [
+              ExcludeFocus(
+                child: IconButton(
+                  tooltip: reversed
+                      ? 'Empezar por la pregunta (R)'
+                      : 'Empezar por la respuesta (R)',
+                  onPressed: _done ? null : _toggleReversed,
+                  icon: Icon(reversed ? Icons.swap_horiz : Icons.swap_horiz_outlined),
+                ),
+              ),
+              ExcludeFocus(
+                child: IconButton(
+                  tooltip: flagged ? 'Quitar marca (B)' : 'Marcar para editar luego (B)',
+                  onPressed: _done || _queue.isEmpty ? null : _toggleFlag,
+                  icon: Icon(
+                    flagged ? Icons.flag : Icons.flag_outlined,
+                    color: flagged ? const Color(0xFFB45309) : null,
+                  ),
+                ),
+              ),
               ExcludeFocus(
                 child: IconButton(
                   tooltip: 'Deshacer (Z)',
@@ -242,6 +287,7 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
   Widget _buildCard() {
     final fact = _queue[_index];
     final deckLabel = _deckLabel(fact);
+    final reversed = context.watch<SessionSettings>().reversed;
     return Column(
       children: [
         LinearProgressIndicator(
@@ -252,23 +298,26 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
         Expanded(
           child: Center(
             child: FlipCard(
-              key: ValueKey('${fact.id}-$_index'),
+              key: ValueKey('${fact.id}-$_index-$reversed'),
               flipped: _flipped,
               onTap: _toggleFlip,
               front: MemoFace(
-                label: 'Pregunta',
-                text: fact.prompt,
-                caption: deckLabel ?? 'Espacio o toca para voltear',
-                tint: AppTheme.primary,
+                label: reversed ? 'Respuesta' : 'Pregunta',
+                text: reversed ? fact.answer : fact.prompt,
+                caption: deckLabel ??
+                    (reversed
+                        ? 'Di el término. Espacio o toca para voltear'
+                        : 'Espacio o toca para voltear'),
+                tint: reversed ? const Color(0xFF4338CA) : AppTheme.primary,
               ),
               back: MemoFace(
-                label: 'Respuesta',
-                text: fact.answer,
+                label: reversed ? 'Término' : 'Respuesta',
+                text: reversed ? fact.prompt : fact.answer,
                 caption: _caption([
                   if (fact.source.isNotEmpty) fact.source,
                   if (deckLabel != null) deckLabel,
                 ]),
-                tint: const Color(0xFF4338CA),
+                tint: reversed ? AppTheme.primary : const Color(0xFF4338CA),
               ),
             ),
           ),
@@ -276,7 +325,7 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
         const SizedBox(height: 16),
         if (!_flipped)
           Text(
-            'Intenta responder en voz alta. 1 No · 2 Casi · 3 Sí · S salta · Z deshace.',
+            'Intenta responder en voz alta. 1 No · 2 Casi · 3 Sí · S salta · Z deshace · B marca · R invierte.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black.withValues(alpha: 0.5)),
           )

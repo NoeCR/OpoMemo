@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 import '../models/deck.dart';
+import '../models/fact.dart';
 import 'memo_repository.dart';
+import 'lpacap_plazos_seed.dart';
 import 'pilot_seed.dart';
 
 abstract final class ContentSeed {
@@ -11,6 +13,7 @@ abstract final class ContentSeed {
 
   static Future<void> ensure(MemoRepository repo, {String? jsonText}) async {
     await PilotSeed.ensure(repo);
+    await LpacapPlazosSeed.ensure(repo);
     final raw = jsonText ?? await rootBundle.loadString(assetPath);
     final payload = jsonDecode(raw) as Map<String, dynamic>;
     final decks = payload['decks'] as List<dynamic>? ?? const [];
@@ -18,11 +21,13 @@ abstract final class ContentSeed {
       final map = Map<String, dynamic>.from(item as Map);
       final facts = (map['facts'] as List<dynamic>? ?? const []).map((rawFact) {
         final fact = Map<String, dynamic>.from(rawFact as Map);
-        return (
+        return SeedFact(
           id: fact['id'] as String,
           prompt: fact['prompt'] as String,
           answer: fact['answer'] as String,
           source: fact['source'] as String? ?? '',
+          kind: FactKind.fromStorage(fact['kind'] as String? ?? 'pregunta'),
+          clozeText: fact['cloze'] as String? ?? '',
         );
       }).toList();
       await repo.seedDeck(

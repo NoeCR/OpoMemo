@@ -5,13 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SessionSettings extends ChangeNotifier {
   static const sizes = [10, 15, 20, 30];
   static const _key = 'session_size';
+  static const _reverseKey = 'session_reversed';
 
   var size = 20;
+  var reversed = false;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getInt(_key) ?? 20;
     size = sizes.contains(stored) ? stored : 20;
+    reversed = prefs.getBool(_reverseKey) ?? false;
     notifyListeners();
   }
 
@@ -21,6 +24,14 @@ class SessionSettings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_key, value);
+  }
+
+  Future<void> setReversed(bool value) async {
+    if (value == reversed) return;
+    reversed = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_reverseKey, value);
   }
 }
 
@@ -43,8 +54,21 @@ Future<void> showSessionSizePicker(BuildContext context) {
                   const Padding(
                     padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
                     child: Text(
-                      'Cartas por sesión',
+                      'Sesión',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text('Empezar por la respuesta'),
+                    subtitle: const Text('Ves el dorso y tienes que producir el término.'),
+                    value: settings.reversed,
+                    onChanged: settings.setReversed,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+                    child: Text(
+                      'Cartas por sesión',
+                      style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                   for (final option in SessionSettings.sizes)

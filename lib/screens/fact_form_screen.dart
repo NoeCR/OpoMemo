@@ -19,6 +19,11 @@ class _FactFormScreenState extends State<FactFormScreen> {
   late final _prompt = TextEditingController(text: widget.existing?.prompt);
   late final _answer = TextEditingController(text: widget.existing?.answer);
   late final _source = TextEditingController(text: widget.existing?.source);
+  late final _cloze = TextEditingController(text: widget.existing?.clozeText);
+  late final _distractors = TextEditingController(
+    text: widget.existing?.distractors.join('\n') ?? '',
+  );
+  late FactKind _kind = widget.existing?.kind ?? FactKind.pregunta;
   var _saving = false;
 
   @override
@@ -26,8 +31,15 @@ class _FactFormScreenState extends State<FactFormScreen> {
     _prompt.dispose();
     _answer.dispose();
     _source.dispose();
+    _cloze.dispose();
+    _distractors.dispose();
     super.dispose();
   }
+
+  List<String> get _parsedDistractors => [
+        for (final line in _distractors.text.split('\n'))
+          if (line.trim().isNotEmpty) line.trim(),
+      ];
 
   Future<void> _save() async {
     final prompt = _prompt.text.trim();
@@ -42,6 +54,9 @@ class _FactFormScreenState extends State<FactFormScreen> {
         prompt: prompt,
         answer: answer,
         source: _source.text,
+        kind: _kind,
+        clozeText: _cloze.text,
+        distractors: _parsedDistractors,
       );
     } else {
       await controller.updateFact(
@@ -49,6 +64,9 @@ class _FactFormScreenState extends State<FactFormScreen> {
           prompt: prompt,
           answer: answer,
           source: _source.text,
+          kind: _kind,
+          clozeText: _cloze.text.trim(),
+          distractors: _parsedDistractors,
         ),
       );
     }
@@ -96,13 +114,25 @@ class _FactFormScreenState extends State<FactFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            DropdownButtonFormField<FactKind>(
+              value: _kind,
+              decoration: const InputDecoration(labelText: 'Tipo de hecho'),
+              items: [
+                for (final kind in FactKind.values)
+                  DropdownMenuItem(value: kind, child: Text(kind.label)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _kind = value);
+              },
+            ),
+            const SizedBox(height: 14),
             TextField(
               controller: _prompt,
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Frente (pregunta)',
-                hintText: 'Puerto HTTPS',
+              decoration: InputDecoration(
+                labelText: _kind == FactKind.termino ? 'Término / anverso' : 'Frente (pregunta)',
+                hintText: _kind == FactKind.termino ? 'Plazo de alzada (acto expreso)' : 'Puerto HTTPS',
               ),
             ),
             const SizedBox(height: 14),
@@ -110,17 +140,40 @@ class _FactFormScreenState extends State<FactFormScreen> {
               controller: _answer,
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Dorso (respuesta)',
-                hintText: '443',
+              decoration: InputDecoration(
+                labelText: _kind == FactKind.termino ? 'Definición / dorso' : 'Dorso (respuesta)',
+                hintText: _kind == FactKind.termino ? '1 mes' : '443',
               ),
             ),
+            if (_kind == FactKind.hueco) ...[
+              const SizedBox(height: 14),
+              TextField(
+                controller: _cloze,
+                maxLines: 3,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  labelText: 'Texto con hueco',
+                  hintText: 'El plazo máximo será de {{3 meses}}.',
+                  helperText: 'Marca el dato tapable entre {{ }}.',
+                ),
+              ),
+            ],
             const SizedBox(height: 14),
             TextField(
               controller: _source,
               decoration: const InputDecoration(
-                labelText: 'Fuente (opcional)',
-                hintText: 'LPACAP art. 122 · IANA',
+                labelText: 'Fuente (ley + artículo)',
+                hintText: 'LPACAP art. 122.1',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _distractors,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Distractores (opcional, uno por línea)',
+                hintText: '6 meses\n15 días',
+                helperText: 'Para Verdadero/falso cuando se abra. No hace falta rellenar ahora.',
               ),
             ),
             const SizedBox(height: 24),

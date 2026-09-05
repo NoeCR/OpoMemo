@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:opomemo/data/content_seed.dart';
+import 'package:opomemo/data/lpacap_plazos_seed.dart';
 import 'package:opomemo/data/memo_repository.dart';
 import 'package:opomemo/database/app_database.dart';
 
@@ -35,5 +36,8 @@ void main() {
     expect(summaries.where((item) => item.deck.id == 'opotest.5.19'), hasLength(1));
     expect(summaries.firstWhere((item) => item.deck.id == 'opotest.5.19').factCount, 1);
     expect(summaries.any((item) => item.deck.groupName == 'Informática'), isTrue);
+    final plazos = summaries.firstWhere((item) => item.deck.id == LpacapPlazosSeed.deckId);
+    expect(plazos.factCount, greaterThanOrEqualTo(30));
+    expect(plazos.deck.groupName, 'Ley 39/2015 · Procedimiento');
   });
 }

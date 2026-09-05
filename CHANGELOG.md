@@ -6,6 +6,23 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ## [Unreleased]
 
+### Added
+- Modelo de hecho: tipo (término / pregunta / hueco), texto con hueco `{{dato}}` y distractores.
+- Mazo atómico **LPACAP · Plazos** (hechos cortos citados al artículo; listo para Huecos más adelante).
+
+---
+
+## [0.2.0] - 2026-09-05
+
+Listado usable: ver el mazo, encontrarlo y organizarlo.
+
+### Added
+- Distribución Leitner (cartas nuevas y cajas 1–5) en el listado y el detalle de mazo.
+- Búsqueda en mazos y en las cartas de un mazo; filtro de cartas marcadas.
+- Sesión al revés: ver la respuesta y producir el término (R o ajustes de inicio).
+- Marcar una carta para editarla después (bandera en el mazo y en la sesión; atajo B).
+- Crear un mazo en una sección existente o nueva, y moverlo al editar. Reabrir la app no devuelve los mazos semilla a su grupo original.
+
 ---
 
 ## [0.1.0] - 2026-09-05

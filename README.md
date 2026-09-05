@@ -2,7 +2,7 @@
 
 App Flutter (Android y Windows) para **memorizar** temario de oposiciones: leyes e informática. Es hermana de [OpoTest](https://github.com/NoeCR): aquella examina; esta graba hechos.
 
-Versión **0.1.0**. Cambios: [CHANGELOG.md](CHANGELOG.md). Plan: [docs/roadmap.md](docs/roadmap.md).
+Versión **0.2.0**. Cambios: [CHANGELOG.md](CHANGELOG.md). Plan: [docs/roadmap.md](docs/roadmap.md).
 
 ## Qué hay ahora
 

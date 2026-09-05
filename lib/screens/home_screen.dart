@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
         title: const Text('OpoMemo'),
         actions: [
           IconButton(
-            tooltip: 'Cartas por sesión',
+            tooltip: 'Ajustes de sesión',
             onPressed: () => showSessionSizePicker(context),
             icon: const Icon(Icons.tune),
           ),
