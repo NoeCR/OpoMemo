@@ -2,7 +2,7 @@
 
 Documento de trabajo. Criterio: **no abrir un modo nuevo hasta que el bucle de tarjetas se use varios días**. Relacionar y Huecos fallan si la carta es un enunciado de test largo. Un hecho alimenta todos los modos.
 
-Versión actual: **0.0.1**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
+Versión actual: **0.1.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
 
 ## Orden de valor
 
@@ -18,13 +18,7 @@ Aparca ligas, IA legal, arcade y rehacer el test de 4 opciones (eso es OpoTest).
 
 ### P0 · que se use todos los días
 
-| Pieza | Por qué |
-|---|---|
-| Repaso del día | Una cola única de cartas due, no entrar mazo a mazo. |
-| Atajos Windows | Espacio voltea; 1 No / 2 Casi / 3 Sí. |
-| Deshacer y saltar | Un Sí de más castiga semanas. |
-| Tamaño de sesión | 10 / 15 / 20 / 30 cartas. |
-| Reaparición en la misma sesión | Un No vuelve al final del lote antes del Leitner. |
+Hecho en **0.1.0**: repaso del día, atajos, deshacer/saltar, tamaño de sesión y reaparición de No/Casi en el lote.
 
 ### P1 · listado y lectura
 

@@ -63,6 +63,10 @@ class _HubScreenState extends State<HubScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
+                        _DailyReviewBar(
+                          due: controller.summaries.fold<int>(0, (sum, item) => sum + item.dueCount),
+                        ),
+                        const SizedBox(height: 16),
                         if (groups.isEmpty)
                           const Padding(
                             padding: EdgeInsets.only(top: 48),
@@ -82,6 +86,33 @@ class _HubScreenState extends State<HubScreen> {
                     ),
                   ),
                 ),
+    );
+  }
+}
+
+class _DailyReviewBar extends StatelessWidget {
+  const _DailyReviewBar({required this.due});
+
+  final int due;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            due == 0 ? 'Nada pendiente entre mazos' : '$due pendientes entre mazos',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.black.withValues(alpha: 0.55),
+            ),
+          ),
+        ),
+        FilledButton(
+          onPressed: due == 0 ? null : () => FlipSessionScreen.open(context),
+          child: const Text('Repaso del día'),
+        ),
+      ],
     );
   }
 }
@@ -183,11 +214,7 @@ class _DeckTile extends StatelessWidget {
               FilledButton(
                 onPressed: due == 0
                     ? null
-                    : () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => FlipSessionScreen(deckId: deck.id),
-                          ),
-                        ),
+                    : () => FlipSessionScreen.open(context, deckId: deck.id),
                 child: Text(due == 0 ? 'Hecho' : 'Repasar'),
               ),
             ],

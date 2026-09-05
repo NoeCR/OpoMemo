@@ -123,11 +123,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     onPressed: due == 0
                         ? null
                         : () async {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => FlipSessionScreen(deckId: widget.deckId),
-                              ),
-                            );
+                            await FlipSessionScreen.open(context, deckId: widget.deckId);
                             await _load();
                           },
                     icon: const Icon(Icons.style_outlined),

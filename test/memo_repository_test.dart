@@ -43,10 +43,10 @@ void main() {
     final fact = await repo.createFact(deckId: deck.id, prompt: 'HTTPS', answer: '443');
     await repo.grade(fact.id, ReviewGrade.yes);
 
-    expect(await repo.dueFacts(deck.id), isEmpty);
+    expect(await repo.dueFacts(deckId: deck.id), isEmpty);
 
     now = DateTime(2026, 9, 6, 9);
-    final due = await repo.dueFacts(deck.id);
+    final due = await repo.dueFacts(deckId: deck.id);
     expect(due.map((item) => item.id), [fact.id]);
   });
 
@@ -59,8 +59,26 @@ void main() {
     final fact = await repo.createFact(deckId: deck.id, prompt: 'HTTPS', answer: '443');
     await repo.grade(fact.id, ReviewGrade.no);
 
-    expect(await repo.dueFacts(deck.id), isEmpty);
+    expect(await repo.dueFacts(deckId: deck.id), isEmpty);
     now = DateTime(2026, 9, 6, 8);
-    expect(await repo.dueFacts(deck.id), isNotEmpty);
+    expect(await repo.dueFacts(deckId: deck.id), isNotEmpty);
+  });
+
+  test('el repaso del día mezcla mazos y respeta el tope', () async {
+    final redes = await repo.createDeck(name: 'Redes', description: '', domain: DeckDomain.info);
+    final leyes = await repo.createDeck(name: 'CE', description: '', domain: DeckDomain.leyes);
+    await repo.createFact(deckId: redes.id, prompt: 'HTTPS', answer: '443');
+    await repo.createFact(deckId: leyes.id, prompt: 'Forma política', answer: 'Monarquía parlamentaria');
+    final mixed = await repo.dueFacts(limit: 10);
+    expect(mixed.map((item) => item.deckId).toSet(), {redes.id, leyes.id});
+  });
+
+  test('deshacer restaura el estado de repaso anterior', () async {
+    final deck = await repo.createDeck(name: 'Redes', description: '', domain: DeckDomain.info);
+    final fact = await repo.createFact(deckId: deck.id, prompt: 'HTTPS', answer: '443');
+    await repo.grade(fact.id, ReviewGrade.yes);
+    expect(await repo.dueFacts(deckId: deck.id), isEmpty);
+    await repo.restoreReview(fact.id, null);
+    expect(await repo.dueFacts(deckId: deck.id), isNotEmpty);
   });
 }

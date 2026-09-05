@@ -8,6 +8,18 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ---
 
+## [0.1.0] - 2026-09-05
+
+Sesión diaria usable: una cola, teclado y deshacer.
+
+### Added
+- Repaso del día: una cola con cartas pendientes de todos los mazos.
+- Atajos en escritorio: espacio voltea; 1 No, 2 Casi, 3 Sí; S salta; Z deshace; Esc sale.
+- Deshacer y saltar en la sesión de tarjetas. Un No o Casi vuelve una vez más al final del lote.
+- Tamaño de sesión (10 / 15 / 20 / 30 cartas) desde el icono de ajustes del inicio.
+
+---
+
 ## [0.0.1] - 2026-09-05
 
 Primera entrega usable: app hermana de OpoTest para memorizar, no para examinarse.

@@ -202,17 +202,20 @@ class MemoRepository {
     return ReviewState.fromMap(rows.first);
   }
 
-  Future<List<Fact>> dueFacts(String deckId, {int limit = 20}) async {
+  Future<List<Fact>> dueFacts({String? deckId, int limit = 20}) async {
     final dueDay = LeitnerScheduler.calendarDay(_clock()).toIso8601String();
-    final rows = await _database.db.rawQuery('''
+    final rows = await _database.db.rawQuery(
+      '''
       SELECT f.*
       FROM facts f
       LEFT JOIN review_states r ON r.fact_id = f.id
-      WHERE f.deck_id = ?
-        AND (r.fact_id IS NULL OR r.next_due <= ?)
+      WHERE (r.fact_id IS NULL OR r.next_due <= ?)
+        AND (? IS NULL OR f.deck_id = ?)
       ORDER BY CASE WHEN r.fact_id IS NULL THEN 0 ELSE 1 END, f.created_at ASC
       LIMIT ?
-    ''', [deckId, dueDay, limit]);
+      ''',
+      [dueDay, deckId, deckId, limit],
+    );
     final facts = rows.map(Fact.fromMap).toList();
     facts.shuffle();
     return facts;
@@ -232,6 +235,18 @@ class MemoRepository {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     return next;
+  }
+
+  Future<void> restoreReview(String factId, ReviewState? previous) async {
+    if (previous == null) {
+      await _database.db.delete('review_states', where: 'fact_id = ?', whereArgs: [factId]);
+      return;
+    }
+    await _database.db.insert(
+      'review_states',
+      previous.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> _touchDeck(String deckId) async {

@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../domain/study_modes.dart';
 import '../state/memo_controller.dart';
+import '../state/session_settings.dart';
 import '../theme/app_theme.dart';
 import '../widgets/page_frame.dart';
+import 'flip_session_screen.dart';
 import 'hub_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,17 +18,29 @@ class HomeScreen extends StatelessWidget {
           0,
           (sum, item) => sum + item.dueCount,
         );
+    final sessionSize = context.watch<SessionSettings>().size;
     return Scaffold(
-      appBar: AppBar(title: const Text('OpoMemo')),
+      appBar: AppBar(
+        title: const Text('OpoMemo'),
+        actions: [
+          IconButton(
+            tooltip: 'Cartas por sesión',
+            onPressed: () => showSessionSizePicker(context),
+            icon: const Icon(Icons.tune),
+          ),
+        ],
+      ),
       body: PageFrame(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
+            _TodayCard(due: due, sessionSize: sessionSize),
+            const SizedBox(height: 20),
             Text(
-              due == 0 ? 'Elige cómo memorizar' : '$due cartas pendientes hoy',
+              'Modos',
               style: TextStyle(
                 color: Colors.black.withValues(alpha: 0.55),
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 6),
@@ -34,11 +48,52 @@ class HomeScreen extends StatelessWidget {
               'Cada modo usa los mismos mazos. Empieza por tarjetas; el resto se irá abriendo.',
               style: TextStyle(fontSize: 16, height: 1.35),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             for (final mode in StudyModes.catalog) ...[
               _ModeCard(mode: mode),
               const SizedBox(height: 12),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TodayCard extends StatelessWidget {
+  const _TodayCard({required this.due, required this.sessionSize});
+
+  final int due;
+  final int sessionSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Hoy', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  Text(
+                    due == 0
+                        ? 'Nada pendiente. Vuelve mañana o abre un mazo nuevo.'
+                        : '$due pendientes · sesión de $sessionSize',
+                    style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton(
+              onPressed: due == 0 ? null : () => FlipSessionScreen.open(context),
+              child: const Text('Estudiar'),
+            ),
           ],
         ),
       ),

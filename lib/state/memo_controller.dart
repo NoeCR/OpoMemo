@@ -102,12 +102,20 @@ class MemoController extends ChangeNotifier {
     await reload();
   }
 
-  Future<List<Fact>> dueFacts(String deckId, {int limit = 20}) {
-    return _repo.dueFacts(deckId, limit: limit);
+  Future<List<Fact>> dueFacts({String? deckId, int limit = 20}) {
+    return _repo.dueFacts(deckId: deckId, limit: limit);
   }
 
-  Future<void> grade(String factId, ReviewGrade grade) async {
+  Future<ReviewState?> reviewFor(String factId) => _repo.reviewFor(factId);
+
+  Future<ReviewState?> grade(String factId, ReviewGrade grade, {bool reload = false}) async {
+    final previous = await _repo.reviewFor(factId);
     await _repo.grade(factId, grade);
-    await reload();
+    if (reload) await this.reload();
+    return previous;
+  }
+
+  Future<void> restoreReview(String factId, ReviewState? previous) {
+    return _repo.restoreReview(factId, previous);
   }
 }
