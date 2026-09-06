@@ -19,7 +19,7 @@ class MemoSearchField extends StatelessWidget {
         hintText: hint,
         prefixIcon: const Icon(Icons.search),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,

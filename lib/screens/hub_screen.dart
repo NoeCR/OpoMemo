@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/deck.dart';
 import '../state/memo_controller.dart';
+import '../theme/app_theme.dart';
 import '../widgets/leitner_strip.dart';
 import '../widgets/memo_search_field.dart';
 import '../widgets/page_frame.dart';
@@ -73,7 +74,7 @@ class _HubScreenState extends State<HubScreen> {
                             ),
                             for (final group in controller.groups)
                               _FilterChip(
-                                label: group.name,
+                                label: group.chipLabel,
                                 selected: _group == group.name,
                                 onTap: () => setState(() => _group = group.name),
                               ),
@@ -127,7 +128,7 @@ class _DailyReviewBar extends StatelessWidget {
             due == 0 ? 'Nada pendiente entre mazos' : '$due pendientes entre mazos',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: Colors.black.withValues(alpha: 0.55),
+              color: AppTheme.muted(context),
             ),
           ),
         ),
@@ -180,7 +181,7 @@ class _GroupHeader extends StatelessWidget {
           '${group.decks.length} mazos · ${group.dueCount} hoy',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Colors.black.withValues(alpha: 0.45),
+            color: AppTheme.muted(context, 0.45),
           ),
         ),
         IconButton(
@@ -207,7 +208,7 @@ class _DeckTile extends StatelessWidget {
     final deck = summary.deck;
     final due = summary.dueCount;
     return Material(
-      color: Colors.white,
+      color: AppTheme.card(context),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -238,7 +239,7 @@ class _DeckTile extends StatelessWidget {
                       ].join(' · '),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                      style: TextStyle(color: AppTheme.muted(context)),
                     ),
                     const SizedBox(height: 8),
                     LeitnerStrip(

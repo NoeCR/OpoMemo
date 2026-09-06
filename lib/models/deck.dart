@@ -121,4 +121,13 @@ class DeckGroup {
 
   int get dueCount => decks.fold(0, (sum, item) => sum + item.dueCount);
   int get factCount => decks.fold(0, (sum, item) => sum + item.factCount);
+
+  String get chipLabel => switch (name) {
+        'Ley 19/2013 · Transparencia' => 'LTAIBG',
+        'TREBEP · RDL 5/2015' => 'TREBEP',
+        'Ley 30/1984 · Reforma de la Función Pública' => '30/1984',
+        'Ley 53/1984 · Incompatibilidades' => '53/1984',
+        Deck.defaultGroup => 'Míos',
+        _ => name.split(' · ').first.replaceFirst(RegExp(r'^Ley\s+'), ''),
+      };
 }

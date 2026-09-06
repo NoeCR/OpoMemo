@@ -328,7 +328,7 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
           Text(
             'Intenta responder en voz alta. 1 No · 2 Casi · 3 Sí · S salta · Z deshace · B marca · R invierte.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black.withValues(alpha: 0.5)),
+            style: TextStyle(color: AppTheme.muted(context, 0.5)),
           )
         else
           ExcludeFocus(

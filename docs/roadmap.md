@@ -2,7 +2,7 @@
 
 Documento de trabajo. Criterio: **no abrir un modo nuevo hasta que el bucle de tarjetas se use varios días**. Relacionar y Huecos fallan si la carta es un enunciado de test largo. Un hecho alimenta todos los modos.
 
-Versión actual: **0.3.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
+Versión actual: **0.4.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
 
 ## Orden de valor
 
@@ -26,7 +26,7 @@ Hecho en **0.2.0**: distribución por caja Leitner, búsqueda en mazos y cartas,
 
 ### P2 · confort
 
-Tema oscuro, recordar ventana en escritorio, chips de filtro cortos (CE, LPACAP, TREBEP). En **0.2.0**: crear o mover mazos entre secciones.
+Hecho en **0.4.0**: tema claro / oscuro / sistema, chips cortos (LTAIBG, TREBEP, 30/1984, 53/1984), recordar ventana en escritorio e icono de la app.
 
 ## Modos anunciados (Próximamente)
 

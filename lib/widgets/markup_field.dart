@@ -96,7 +96,7 @@ class _MarkupFieldState extends State<MarkupField> {
                 'Selecciona una palabra y márcala. **negrita** o *cursiva*.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                 ),
               ),
             ),

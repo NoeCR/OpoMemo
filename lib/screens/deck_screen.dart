@@ -5,6 +5,7 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import '../domain/memo_markup.dart';
 import '../state/memo_controller.dart';
+import '../theme/app_theme.dart';
 import '../widgets/leitner_strip.dart';
 import '../widgets/memo_search_field.dart';
 import '../widgets/page_frame.dart';
@@ -145,7 +146,7 @@ class _DeckScreenState extends State<DeckScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         deck!.description,
-                        style: TextStyle(color: Colors.black.withValues(alpha: 0.6)),
+                        style: TextStyle(color: AppTheme.muted(context, 0.6)),
                       ),
                     ),
                   FilledButton.icon(
@@ -203,7 +204,7 @@ class _DeckScreenState extends State<DeckScreen> {
                         _flaggedOnly
                             ? 'No hay cartas marcadas${_query.trim().isEmpty ? '.' : ' que coincidan.'}'
                             : 'Ninguna carta coincide con la búsqueda.',
-                        style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                        style: TextStyle(color: AppTheme.muted(context)),
                       ),
                     )
                   else

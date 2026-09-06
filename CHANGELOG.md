@@ -8,6 +8,18 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ---
 
+## [0.4.0] - 2026-09-06
+
+Confort de uso diario: tema, chips cortos, ventana e icono.
+
+### Added
+- Tema claro, oscuro o el del sistema, desde el icono de ajustes del inicio.
+- Chips cortos en el listado de mazos: LTAIBG, TREBEP, 30/1984, 53/1984.
+- La ventana de escritorio recuerda tamaño, posición y si estaba maximizada.
+- Icono de la app (cerebro con tarjetas) en Windows, Android y la barra de inicio.
+
+---
+
 ## [0.3.0] - 2026-09-06
 
 Hechos con aclaración y un catálogo propio, sin tests de OpoTest.

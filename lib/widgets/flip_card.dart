@@ -94,17 +94,18 @@ class MemoFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final note = explanation?.trim() ?? '';
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 280),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: tint.withValues(alpha: 0.18)),
         boxShadow: [
           BoxShadow(
-            color: tint.withValues(alpha: 0.12),
+            color: tint.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.08 : 0.12),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -127,11 +128,11 @@ class MemoFace extends StatelessWidget {
             Text.rich(
               MemoMarkup.toSpan(
                 text,
-                const TextStyle(
+                TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w600,
                   height: 1.25,
-                  color: Color(0xFF111827),
+                  color: onSurface,
                 ),
                 accent: tint,
               ),
@@ -166,7 +167,7 @@ class MemoFace extends StatelessWidget {
                           fontSize: 16,
                           height: 1.4,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black.withValues(alpha: 0.72),
+                          color: onSurface.withValues(alpha: 0.72),
                         ),
                         accent: tint,
                       ),
@@ -181,7 +182,7 @@ class MemoFace extends StatelessWidget {
                 caption!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: onSurface.withValues(alpha: 0.45),
                   fontWeight: FontWeight.w600,
                 ),
               ),

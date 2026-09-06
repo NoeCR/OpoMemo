@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:opomemo/models/deck.dart';
+import 'package:opomemo/theme/app_theme.dart';
 import 'package:opomemo/widgets/flip_card.dart';
 
 void main() {
+  test('los chips del hub acortan los grupos semilla', () {
+    expect(const DeckGroup(name: 'Ley 19/2013 · Transparencia', decks: []).chipLabel, 'LTAIBG');
+    expect(const DeckGroup(name: 'TREBEP · RDL 5/2015', decks: []).chipLabel, 'TREBEP');
+    expect(const DeckGroup(name: 'Ley 30/1984 · Reforma de la Función Pública', decks: []).chipLabel, '30/1984');
+    expect(const DeckGroup(name: 'Ley 53/1984 · Incompatibilidades', decks: []).chipLabel, '53/1984');
+  });
+
   testWidgets('al tocar la tarjeta muestra el dorso', (tester) async {
     var flipped = false;
     await tester.pumpWidget(
@@ -37,5 +46,23 @@ void main() {
     expect(find.text('443'), findsOneWidget);
     expect(find.text('Aclaración'), findsOneWidget);
     expect(find.text('Puerto por defecto de HTTPS.'), findsOneWidget);
+  });
+
+  testWidgets('en tema oscuro el dorso sigue siendo legible', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark(),
+        home: const Scaffold(
+          body: MemoFace(
+            label: 'Respuesta',
+            text: '443',
+            explanation: 'Puerto por defecto de HTTPS.',
+            tint: Colors.teal,
+          ),
+        ),
+      ),
+    );
+    expect(find.text('443'), findsOneWidget);
+    expect(find.text('Aclaración'), findsOneWidget);
   });
 }

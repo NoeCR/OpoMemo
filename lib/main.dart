@@ -6,9 +6,11 @@ import 'data/memo_repository.dart';
 import 'database/app_database.dart';
 import 'state/memo_controller.dart';
 import 'state/session_settings.dart';
+import 'state/window_placement.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowPlacement.restore();
   final database = await AppDatabase.open();
   final settings = SessionSettings();
   await settings.load();

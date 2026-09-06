@@ -21,10 +21,24 @@ class HomeScreen extends StatelessWidget {
     final sessionSize = context.watch<SessionSettings>().size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('OpoMemo'),
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/branding/opomemo_icon.png',
+                width: 32,
+                height: 32,
+                filterQuality: FilterQuality.medium,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text('OpoMemo'),
+          ],
+        ),
         actions: [
           IconButton(
-            tooltip: 'Ajustes de sesión',
+            tooltip: 'Ajustes',
             onPressed: () => showSessionSizePicker(context),
             icon: const Icon(Icons.tune),
           ),
@@ -39,7 +53,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Modos',
               style: TextStyle(
-                color: Colors.black.withValues(alpha: 0.55),
+                color: AppTheme.muted(context),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -69,7 +83,7 @@ class _TodayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppTheme.card(context),
       borderRadius: BorderRadius.circular(18),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -85,7 +99,7 @@ class _TodayCard extends StatelessWidget {
                     due == 0
                         ? 'Nada pendiente. Vuelve mañana o abre un mazo nuevo.'
                         : '$due pendientes · sesión de $sessionSize',
-                    style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                    style: TextStyle(color: AppTheme.muted(context)),
                   ),
                 ],
               ),
@@ -108,8 +122,9 @@ class _ModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Material(
-      color: Colors.white,
+      color: AppTheme.card(context),
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -152,7 +167,7 @@ class _ModeCard extends StatelessWidget {
                   color: mode.tint.withValues(alpha: mode.isReady ? 0.14 : 0.08),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(mode.icon, color: mode.isReady ? mode.tint : Colors.black38),
+                child: Icon(mode.icon, color: mode.isReady ? mode.tint : onSurface.withValues(alpha: 0.38)),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -167,7 +182,7 @@ class _ModeCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: mode.isReady ? AppTheme.ink : Colors.black54,
+                              color: mode.isReady ? onSurface : onSurface.withValues(alpha: 0.54),
                             ),
                           ),
                         ),
@@ -175,7 +190,7 @@ class _ModeCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.06),
+                              color: onSurface.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: const Text(
@@ -188,7 +203,7 @@ class _ModeCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       mode.subtitle,
-                      style: TextStyle(color: Colors.black.withValues(alpha: 0.55)),
+                      style: TextStyle(color: AppTheme.muted(context)),
                     ),
                   ],
                 ),

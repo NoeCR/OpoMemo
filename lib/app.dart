@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home_screen.dart';
 import 'state/memo_controller.dart';
+import 'state/session_settings.dart';
 import 'theme/app_theme.dart';
 
 class OpoMemoApp extends StatelessWidget {
@@ -10,10 +11,13 @@ class OpoMemoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SessionSettings>();
     return MaterialApp(
       title: 'OpoMemo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: settings.themeMode,
       home: const _Root(),
     );
   }
