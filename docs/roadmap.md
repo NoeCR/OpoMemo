@@ -2,7 +2,7 @@
 
 Documento de trabajo. Criterio: **no abrir un modo nuevo hasta que el bucle de tarjetas se use varios días**. Relacionar y Huecos fallan si la carta es un enunciado de test largo. Un hecho alimenta todos los modos.
 
-Versión actual: **0.4.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
+Versión actual: **0.5.0**. Detalle de releases: [CHANGELOG.md](../CHANGELOG.md).
 
 ## Orden de valor
 
@@ -32,19 +32,19 @@ Hecho en **0.4.0**: tema claro / oscuro / sistema, chips cortos (LTAIBG, TREBEP,
 
 | Modo | Orden | Listo cuando |
 |---|---|---|
-| Huecos | 2.º (leyes) | El hecho tiene un dato tapable (plazo, artículo). |
+| Huecos | 2.º (leyes) | Listo en **0.5.0**. El hecho tiene un dato tapable (`{{dato}}`). |
 | Relacionar | 3.º | Hechos cortos término ↔ definición. Toque-toque, no flechas. |
 | Verdadero / falso | 4.º | Distractores de OpoTest o trampas redactadas a mano. |
 
-Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Match adelanta el due en tarjetas. En **0.3.0** el contrato ya está en el modelo; Huecos y Relacionar siguen cerrados.
+Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Huecos adelanta el due en tarjetas. Relacionar sigue cerrado.
 
 ## Contenido
 
-Catálogo activo (markdown Pregunta → Respuesta → truco): **Ley 19/2013**, **TREBEP**, **Ley 30/1984** y **Ley 53/1984**. El resto de semilla (OpoTest, plazos LPACAP, órganos CE, Redes) está en `assets/seed/archive` y en los Dart de `lib/data`, sin cargarse.
+Catálogo activo: markdown de **Ley 19/2013**, **TREBEP**, **Ley 30/1984** y **Ley 53/1984**, más mazos atómicos **LPACAP · Plazos** y **CE · Órganos** para Huecos. OpoTest y Redes siguen archivados.
 
 Tres capas:
 
-- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, puertos). Oro para Huecos y Relacionar. Código listo, no sembrado.
+- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE). Oro para Huecos y Relacionar. Sembrados en **0.5.0**.
 - **B · Importada limpia** — reextraer OpoTest con distractores y artículo; no borrar el SRS de ids `opotest.q.*`.
 - **C · Volumen** — resto de leyes e importador JSON. Cuando el hábito diario exista.
 

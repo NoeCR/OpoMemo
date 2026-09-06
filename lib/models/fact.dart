@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../domain/cloze.dart';
 import '../domain/memo_markup.dart';
 
 enum FactKind {
@@ -49,6 +50,8 @@ class Fact {
   final bool flagged;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  bool get hasCloze => Cloze.hasBlanks(clozeText);
 
   bool matches(String query) {
     final needle = query.trim().toLowerCase();

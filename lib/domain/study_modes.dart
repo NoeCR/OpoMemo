@@ -39,20 +39,20 @@ abstract final class StudyModes {
       tint: Color(0xFF0F766E),
     ),
     StudyMode(
+      id: cloze,
+      title: 'Huecos',
+      subtitle: 'Completa el plazo, el artículo o el dato que falta.',
+      icon: Icons.space_bar,
+      status: StudyModeStatus.ready,
+      tint: Color(0xFFB45309),
+    ),
+    StudyMode(
       id: match,
       title: 'Relacionar',
       subtitle: 'Empareja concepto y definición. Mismos mazos, otra mecánica.',
       icon: Icons.hub_outlined,
       status: StudyModeStatus.coming,
       tint: Color(0xFF1D4ED8),
-    ),
-    StudyMode(
-      id: cloze,
-      title: 'Huecos',
-      subtitle: 'Completa el plazo, el artículo o el dato que falta.',
-      icon: Icons.space_bar,
-      status: StudyModeStatus.coming,
-      tint: Color(0xFFB45309),
     ),
     StudyMode(
       id: trueFalse,

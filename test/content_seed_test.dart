@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:opomemo/data/ce_organos_seed.dart';
 import 'package:opomemo/data/content_seed.dart';
+import 'package:opomemo/data/lpacap_plazos_seed.dart';
 import 'package:opomemo/data/markdown_card_parser.dart';
 import 'package:opomemo/data/memo_repository.dart';
 import 'package:opomemo/database/app_database.dart';
@@ -73,10 +75,17 @@ void main() {
         'TREBEP · RDL 5/2015',
         'Ley 30/1984 · Reforma de la Función Pública',
         'Ley 53/1984 · Incompatibilidades',
+        'Ley 39/2015 · Procedimiento',
+        'Constitución Española',
       },
     );
     expect(summaries.where((item) => item.deck.id.startsWith('md.ley30.')), hasLength(6));
     expect(summaries.where((item) => item.deck.id.startsWith('md.ley53.')), hasLength(6));
-    expect(summaries.fold<int>(0, (sum, item) => sum + item.factCount), 195);
+    expect(summaries.any((item) => item.deck.id == LpacapPlazosSeed.deckId), isTrue);
+    expect(summaries.any((item) => item.deck.id == CeOrganosSeed.deckId), isTrue);
+    expect(summaries.fold<int>(0, (sum, item) => sum + item.factCount), greaterThan(195));
+    final cloze = await repo.dueFacts(clozeOnly: true, limit: 80);
+    expect(cloze, isNotEmpty);
+    expect(cloze.every((fact) => fact.hasCloze), isTrue);
   });
 }

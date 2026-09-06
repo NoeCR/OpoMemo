@@ -227,6 +227,12 @@ class MemoRepository {
           [item.explanation.trim(), item.id],
         );
       }
+      if (item.clozeText.trim().isNotEmpty) {
+        await _database.db.rawUpdate(
+          "UPDATE facts SET cloze_text = ?, kind = ? WHERE id = ? AND (cloze_text = '' OR cloze_text IS NULL)",
+          [item.clozeText.trim(), item.kind.name, item.id],
+        );
+      }
     }
   }
 
@@ -259,7 +265,7 @@ class MemoRepository {
     return ReviewState.fromMap(rows.first);
   }
 
-  Future<List<Fact>> dueFacts({String? deckId, int limit = 20}) async {
+  Future<List<Fact>> dueFacts({String? deckId, int limit = 20, bool clozeOnly = false}) async {
     final dueDay = LeitnerScheduler.calendarDay(_clock()).toIso8601String();
     final rows = await _database.db.rawQuery(
       '''
@@ -268,10 +274,11 @@ class MemoRepository {
       LEFT JOIN review_states r ON r.fact_id = f.id
       WHERE (r.fact_id IS NULL OR r.next_due <= ?)
         AND (? IS NULL OR f.deck_id = ?)
+        AND (? = 0 OR f.cloze_text LIKE '%{{%')
       ORDER BY CASE WHEN r.fact_id IS NULL THEN 0 ELSE 1 END, f.created_at ASC
       LIMIT ?
       ''',
-      [dueDay, deckId, deckId, limit],
+      [dueDay, deckId, deckId, clozeOnly ? 1 : 0, limit],
     );
     final facts = rows.map(Fact.fromMap).toList();
     facts.shuffle();

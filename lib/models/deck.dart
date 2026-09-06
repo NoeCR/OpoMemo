@@ -127,6 +127,8 @@ class DeckGroup {
         'TREBEP · RDL 5/2015' => 'TREBEP',
         'Ley 30/1984 · Reforma de la Función Pública' => '30/1984',
         'Ley 53/1984 · Incompatibilidades' => '53/1984',
+        'Ley 39/2015 · Procedimiento' => 'LPACAP',
+        'Constitución Española' => 'CE',
         Deck.defaultGroup => 'Míos',
         _ => name.split(' · ').first.replaceFirst(RegExp(r'^Ley\s+'), ''),
       };

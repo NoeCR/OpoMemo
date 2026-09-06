@@ -2,7 +2,6 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import 'memo_repository.dart';
 
-/// Archivado: no se carga en [ContentSeed]. Conservado por si se reactiva.
 /// Hechos cortos de plazos de la Ley 39/2015. Citas del BOE-A-2015-10565.
 abstract final class LpacapPlazosSeed {
   static const deckId = 'atomic.lpacap.plazos';

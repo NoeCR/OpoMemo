@@ -6,6 +6,7 @@ import '../state/memo_controller.dart';
 import '../state/session_settings.dart';
 import '../theme/app_theme.dart';
 import '../widgets/page_frame.dart';
+import 'cloze_session_screen.dart';
 import 'flip_session_screen.dart';
 import 'hub_screen.dart';
 
@@ -129,10 +130,14 @@ class _ModeCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {
-          if (mode.isReady) {
+          if (mode.id == StudyModes.flip) {
             Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const HubScreen()),
             );
+            return;
+          }
+          if (mode.id == StudyModes.cloze) {
+            ClozeSessionScreen.open(context);
             return;
           }
           showModalBottomSheet<void>(

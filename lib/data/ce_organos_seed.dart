@@ -2,7 +2,6 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import 'memo_repository.dart';
 
-/// Archivado: no se carga en [ContentSeed]. Conservado por si se reactiva.
 /// Órganos constitucionales. Citas del BOE-A-1978-31229 (texto consolidado).
 abstract final class CeOrganosSeed {
   static const deckId = 'atomic.ce.organos';

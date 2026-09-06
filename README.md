@@ -2,13 +2,13 @@
 
 App Flutter (Android y Windows) para **memorizar** temario de oposiciones: leyes e informática. Es hermana de [OpoTest](https://github.com/NoeCR): aquella examina; esta graba hechos.
 
-Versión **0.4.0**. Cambios: [CHANGELOG.md](CHANGELOG.md). Plan: [docs/roadmap.md](docs/roadmap.md).
+Versión **0.5.0**. Cambios: [CHANGELOG.md](CHANGELOG.md). Plan: [docs/roadmap.md](docs/roadmap.md).
 
 ## Qué hay ahora
 
-- Hub de modos: **Tarjetas** usable; Relacionar, Huecos y Verdadero/falso anunciados.
+- Hub de modos: **Tarjetas** y **Huecos** usables; Relacionar y Verdadero/falso anunciados.
 - Volteo con autoevaluación No / Casi / Sí y repetición espaciada (Leitner).
-- Mazos semilla activos: **Ley 19/2013**, **TREBEP**, **Ley 30/1984** y **Ley 53/1984**, por capítulo. El extracto de OpoTest y los mazos atómicos previos están archivados.
+- Mazos semilla: leyes del tema 4 (markdown) más **LPACAP · Plazos** y **CE · Órganos** para Huecos.
 - Tema claro, oscuro o el del sistema, desde ajustes. En escritorio, la ventana recuerda tamaño y posición.
 
 ## Ejecutar

@@ -10,6 +10,8 @@ void main() {
     expect(const DeckGroup(name: 'TREBEP · RDL 5/2015', decks: []).chipLabel, 'TREBEP');
     expect(const DeckGroup(name: 'Ley 30/1984 · Reforma de la Función Pública', decks: []).chipLabel, '30/1984');
     expect(const DeckGroup(name: 'Ley 53/1984 · Incompatibilidades', decks: []).chipLabel, '53/1984');
+    expect(const DeckGroup(name: 'Ley 39/2015 · Procedimiento', decks: []).chipLabel, 'LPACAP');
+    expect(const DeckGroup(name: 'Constitución Española', decks: []).chipLabel, 'CE');
   });
 
   testWidgets('al tocar la tarjeta muestra el dorso', (tester) async {

@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 
 import '../models/deck.dart';
+import 'ce_organos_seed.dart';
+import 'lpacap_plazos_seed.dart';
 import 'markdown_card_parser.dart';
 import 'memo_repository.dart';
 
@@ -18,8 +20,8 @@ class MarkdownSeedCatalog {
   final String sourcePrefix;
 }
 
-/// Catálogo semilla activo. El resto (OpoTest, plazos, órganos, Redes) está
-/// archivado en `assets/seed/archive` y en los Dart de `lib/data/*_seed.dart`.
+/// Catálogo semilla activo: markdown del tema 4 más mazos atómicos para Huecos.
+/// OpoTest y Redes están en `assets/seed/archive`.
 abstract final class ContentSeed {
   static const catalog = [
     MarkdownSeedCatalog(
@@ -53,6 +55,10 @@ abstract final class ContentSeed {
     Map<String, String>? markdownByPrefix,
   }) async {
     final keepIds = <String>{};
+    await LpacapPlazosSeed.ensure(repo);
+    keepIds.add(LpacapPlazosSeed.deckId);
+    await CeOrganosSeed.ensure(repo);
+    keepIds.add(CeOrganosSeed.deckId);
     for (final item in catalog) {
       final markdown = markdownByPrefix?[item.idPrefix] ?? await rootBundle.loadString(item.assetPath);
       final decks = MarkdownCardParser.parse(

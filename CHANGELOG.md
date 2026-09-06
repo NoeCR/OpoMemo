@@ -8,6 +8,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ---
 
+## [0.5.0] - 2026-09-06
+
+Huecos: escribe el dato que falta, misma cola Leitner.
+
+### Added
+- Modo **Huecos**: escribe el plazo o el dato que falta (`{{dato}}`) y califica No / Casi / Sí. Misma cola Leitner que las tarjetas.
+- Se siembran de nuevo los mazos atómicos **LPACAP · Plazos** y **CE · Órganos**, pensados para este modo.
+
+---
+
 ## [0.4.0] - 2026-09-06
 
 Confort de uso diario: tema, chips cortos, ventana e icono.
