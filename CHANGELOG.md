@@ -6,6 +6,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ## [Unreleased]
 
+### Added
+- Modo **Relacionar**: toque-toque término ↔ definición sobre hechos cortos (`FactKind.termino`). Un fallo cuenta sobre el primer toque (0 → Sí, 1 → Casi, 2+ → No).
+- Se vuelve a sembrar **Informática · Redes** (pares cortos para este modo).
+
+### Changed
+- En Relacionar, cada pareja acertada usa un color y un número distintos; la selección en curso es ámbar y un fallo se marca en rojo.
+- Relacionar arma siempre tableros de 4 pares del mismo mazo (no mezcla Constitución e informática). La sesión termina cuando no queda un tablero completo.
+- Relacionar se abre por secciones, como Tarjetas.
+- En Huecos, al elegir la última palabra se comprueba solo. El botón es siempre Continuar.
+- Los botones No / Casi / Sí ya no muestran 1 · 2 · 3.
+
 ---
 
 ## [0.5.0] - 2026-09-06

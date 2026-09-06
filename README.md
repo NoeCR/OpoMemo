@@ -6,9 +6,9 @@ Versión **0.5.0**. Cambios: [CHANGELOG.md](CHANGELOG.md). Plan: [docs/roadmap.m
 
 ## Qué hay ahora
 
-- Hub de modos: **Tarjetas** y **Huecos** usables; Relacionar y Verdadero/falso anunciados.
+- Hub de modos: **Tarjetas**, **Huecos** y **Relacionar** usables; Verdadero/falso anunciado.
 - Volteo con autoevaluación No / Casi / Sí y repetición espaciada (Leitner).
-- Mazos semilla: leyes del tema 4 (markdown) más **LPACAP · Plazos** y **CE · Órganos** para Huecos.
+- Mazos semilla: leyes del tema 4 (markdown), **LPACAP · Plazos**, **CE · Órganos** y **Informática · Redes**.
 - Tema claro, oscuro o el del sistema, desde ajustes. En escritorio, la ventana recuerda tamaño y posición.
 
 ## Ejecutar

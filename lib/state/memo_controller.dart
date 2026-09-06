@@ -125,8 +125,22 @@ class MemoController extends ChangeNotifier {
     await reload();
   }
 
-  Future<List<Fact>> dueFacts({String? deckId, int limit = 20, bool clozeOnly = false}) {
-    return _repo.dueFacts(deckId: deckId, limit: limit, clozeOnly: clozeOnly);
+  Future<List<Fact>> dueFacts({
+    String? deckId,
+    int limit = 20,
+    bool clozeOnly = false,
+    FactKind? kind,
+  }) {
+    return _repo.dueFacts(deckId: deckId, limit: limit, clozeOnly: clozeOnly, kind: kind);
+  }
+
+  Future<List<Fact>> factsByKind(
+    FactKind kind, {
+    int limit = 40,
+    Set<String> excludeIds = const {},
+    String? deckId,
+  }) {
+    return _repo.factsByKind(kind, limit: limit, excludeIds: excludeIds, deckId: deckId);
   }
 
   Future<ReviewState?> reviewFor(String factId) => _repo.reviewFor(factId);

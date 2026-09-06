@@ -12,6 +12,7 @@ void main() {
     expect(const DeckGroup(name: 'Ley 53/1984 · Incompatibilidades', decks: []).chipLabel, '53/1984');
     expect(const DeckGroup(name: 'Ley 39/2015 · Procedimiento', decks: []).chipLabel, 'LPACAP');
     expect(const DeckGroup(name: 'Constitución Española', decks: []).chipLabel, 'CE');
+    expect(const DeckGroup(name: 'Informática', decks: []).chipLabel, 'Info');
   });
 
   testWidgets('al tocar la tarjeta muestra el dorso', (tester) async {

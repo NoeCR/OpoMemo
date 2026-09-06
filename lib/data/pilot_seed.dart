@@ -2,7 +2,7 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import 'memo_repository.dart';
 
-/// Archivado: no se carga en [ContentSeed]. Conservado por si se reactiva.
+/// Pares cortos término ↔ definición para Relacionar.
 abstract final class PilotSeed {
   static const deckId = 'pilot.redes.transporte';
 

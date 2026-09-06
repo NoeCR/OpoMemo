@@ -6,6 +6,7 @@ import 'package:opomemo/data/content_seed.dart';
 import 'package:opomemo/data/lpacap_plazos_seed.dart';
 import 'package:opomemo/data/markdown_card_parser.dart';
 import 'package:opomemo/data/memo_repository.dart';
+import 'package:opomemo/data/pilot_seed.dart';
 import 'package:opomemo/database/app_database.dart';
 import 'package:opomemo/models/deck.dart';
 import 'package:opomemo/models/fact.dart';
@@ -77,15 +78,20 @@ void main() {
         'Ley 53/1984 · Incompatibilidades',
         'Ley 39/2015 · Procedimiento',
         'Constitución Española',
+        'Informática',
       },
     );
     expect(summaries.where((item) => item.deck.id.startsWith('md.ley30.')), hasLength(6));
     expect(summaries.where((item) => item.deck.id.startsWith('md.ley53.')), hasLength(6));
     expect(summaries.any((item) => item.deck.id == LpacapPlazosSeed.deckId), isTrue);
     expect(summaries.any((item) => item.deck.id == CeOrganosSeed.deckId), isTrue);
-    expect(summaries.fold<int>(0, (sum, item) => sum + item.factCount), greaterThan(195));
+    expect(summaries.any((item) => item.deck.id == PilotSeed.deckId), isTrue);
+    expect(summaries.fold<int>(0, (sum, item) => sum + item.factCount), greaterThan(225));
     final cloze = await repo.dueFacts(clozeOnly: true, limit: 80);
     expect(cloze, isNotEmpty);
     expect(cloze.every((fact) => fact.hasCloze), isTrue);
+    final pairs = await repo.dueFacts(kind: FactKind.termino, limit: 80);
+    expect(pairs, isNotEmpty);
+    expect(pairs.every((fact) => fact.kind == FactKind.termino), isTrue);
   });
 }

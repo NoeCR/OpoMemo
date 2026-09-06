@@ -5,6 +5,7 @@ import 'ce_organos_seed.dart';
 import 'lpacap_plazos_seed.dart';
 import 'markdown_card_parser.dart';
 import 'memo_repository.dart';
+import 'pilot_seed.dart';
 
 class MarkdownSeedCatalog {
   const MarkdownSeedCatalog({
@@ -20,8 +21,8 @@ class MarkdownSeedCatalog {
   final String sourcePrefix;
 }
 
-/// Catálogo semilla activo: markdown del tema 4 más mazos atómicos para Huecos.
-/// OpoTest y Redes están en `assets/seed/archive`.
+/// Catálogo semilla activo: markdown del tema 4, mazos atómicos (Huecos) y Redes (Relacionar).
+/// OpoTest sigue en `assets/seed/archive`.
 abstract final class ContentSeed {
   static const catalog = [
     MarkdownSeedCatalog(
@@ -59,6 +60,8 @@ abstract final class ContentSeed {
     keepIds.add(LpacapPlazosSeed.deckId);
     await CeOrganosSeed.ensure(repo);
     keepIds.add(CeOrganosSeed.deckId);
+    await PilotSeed.ensure(repo);
+    keepIds.add(PilotSeed.deckId);
     for (final item in catalog) {
       final markdown = markdownByPrefix?[item.idPrefix] ?? await rootBundle.loadString(item.assetPath);
       final decks = MarkdownCardParser.parse(

@@ -326,7 +326,7 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
         const SizedBox(height: 16),
         if (!_flipped)
           Text(
-            'Intenta responder en voz alta. 1 No · 2 Casi · 3 Sí · S salta · Z deshace · B marca · R invierte.',
+            'Intenta responder en voz alta. S salta · Z deshace · B marca · R invierte.',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppTheme.muted(context, 0.5)),
           )
@@ -337,7 +337,6 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
               Expanded(
                 child: _GradeButton(
                   label: 'No',
-                  hint: '1',
                   color: const Color(0xFFB91C1C),
                   onPressed: _grading ? null : () => _grade(ReviewGrade.no),
                 ),
@@ -346,7 +345,6 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
               Expanded(
                 child: _GradeButton(
                   label: 'Casi',
-                  hint: '2',
                   color: const Color(0xFFB45309),
                   onPressed: _grading ? null : () => _grade(ReviewGrade.almost),
                 ),
@@ -355,7 +353,6 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
               Expanded(
                 child: _GradeButton(
                   label: 'Sí',
-                  hint: '3',
                   color: AppTheme.primary,
                   onPressed: _grading ? null : () => _grade(ReviewGrade.yes),
                 ),
@@ -376,13 +373,11 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
 class _GradeButton extends StatelessWidget {
   const _GradeButton({
     required this.label,
-    required this.hint,
     required this.color,
     required this.onPressed,
   });
 
   final String label;
-  final String hint;
   final Color color;
   final VoidCallback? onPressed;
 
@@ -395,7 +390,7 @@ class _GradeButton extends StatelessWidget {
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
       ),
-      child: Text('$label  $hint'),
+      child: Text(label),
     );
   }
 }

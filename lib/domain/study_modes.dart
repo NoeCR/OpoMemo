@@ -41,7 +41,7 @@ abstract final class StudyModes {
     StudyMode(
       id: cloze,
       title: 'Huecos',
-      subtitle: 'Completa el plazo, el artículo o el dato que falta.',
+      subtitle: 'Elige las palabras y completa la frase. Si fallas, vuelve a salir.',
       icon: Icons.space_bar,
       status: StudyModeStatus.ready,
       tint: Color(0xFFB45309),
@@ -49,9 +49,9 @@ abstract final class StudyModes {
     StudyMode(
       id: match,
       title: 'Relacionar',
-      subtitle: 'Empareja concepto y definición. Mismos mazos, otra mecánica.',
+      subtitle: 'Empareja término y definición del mismo mazo. Toque-toque, sin flechas.',
       icon: Icons.hub_outlined,
-      status: StudyModeStatus.coming,
+      status: StudyModeStatus.ready,
       tint: Color(0xFF1D4ED8),
     ),
     StudyMode(

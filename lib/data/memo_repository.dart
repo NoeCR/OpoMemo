@@ -265,7 +265,12 @@ class MemoRepository {
     return ReviewState.fromMap(rows.first);
   }
 
-  Future<List<Fact>> dueFacts({String? deckId, int limit = 20, bool clozeOnly = false}) async {
+  Future<List<Fact>> dueFacts({
+    String? deckId,
+    int limit = 20,
+    bool clozeOnly = false,
+    FactKind? kind,
+  }) async {
     final dueDay = LeitnerScheduler.calendarDay(_clock()).toIso8601String();
     final rows = await _database.db.rawQuery(
       '''
@@ -275,14 +280,42 @@ class MemoRepository {
       WHERE (r.fact_id IS NULL OR r.next_due <= ?)
         AND (? IS NULL OR f.deck_id = ?)
         AND (? = 0 OR f.cloze_text LIKE '%{{%')
+        AND (? IS NULL OR f.kind = ?)
       ORDER BY CASE WHEN r.fact_id IS NULL THEN 0 ELSE 1 END, f.created_at ASC
       LIMIT ?
       ''',
-      [dueDay, deckId, deckId, clozeOnly ? 1 : 0, limit],
+      [dueDay, deckId, deckId, clozeOnly ? 1 : 0, kind?.name, kind?.name, limit],
     );
     final facts = rows.map(Fact.fromMap).toList();
     facts.shuffle();
     return facts;
+  }
+
+  Future<List<Fact>> factsByKind(
+    FactKind kind, {
+    int limit = 40,
+    Set<String> excludeIds = const {},
+    String? deckId,
+  }) async {
+    final dueDay = LeitnerScheduler.calendarDay(_clock()).toIso8601String();
+    final rows = await _database.db.rawQuery(
+      '''
+      SELECT f.*
+      FROM facts f
+      LEFT JOIN review_states r ON r.fact_id = f.id
+      WHERE f.kind = ?
+        AND (? IS NULL OR f.deck_id = ?)
+      ORDER BY CASE WHEN r.fact_id IS NULL OR r.next_due <= ? THEN 0 ELSE 1 END, f.created_at ASC
+      LIMIT ?
+      ''',
+      [kind.name, deckId, deckId, dueDay, limit + excludeIds.length],
+    );
+    final facts = [
+      for (final row in rows)
+        if (!excludeIds.contains(row['id'])) Fact.fromMap(row),
+    ];
+    facts.shuffle();
+    return facts.take(limit).toList();
   }
 
   Future<ReviewState> grade(String factId, ReviewGrade grade) async {

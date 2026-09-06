@@ -129,6 +129,7 @@ class DeckGroup {
         'Ley 53/1984 · Incompatibilidades' => '53/1984',
         'Ley 39/2015 · Procedimiento' => 'LPACAP',
         'Constitución Española' => 'CE',
+        'Informática' => 'Info',
         Deck.defaultGroup => 'Míos',
         _ => name.split(' · ').first.replaceFirst(RegExp(r'^Ley\s+'), ''),
       };

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/cloze.dart';
+import '../domain/cloze_bank.dart';
 import '../models/fact.dart';
 import '../models/review.dart';
 import '../state/memo_controller.dart';
@@ -32,34 +33,31 @@ class _UndoEntry {
     required this.index,
     required this.fact,
     required this.previous,
-    required this.grade,
+    required this.solved,
     required this.requeued,
   });
 
   final int index;
   final Fact fact;
   final ReviewState? previous;
-  final ReviewGrade grade;
+  final bool solved;
   final bool requeued;
 }
 
 class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
   final _focusNode = FocusNode();
   List<Fact> _queue = const [];
+  List<Fact> _pool = const [];
   final _undoStack = <_UndoEntry>[];
-  final _requeuedIds = <String>{};
-  var _inputs = <TextEditingController>[];
+  ClozePick? _pick;
   var _index = 0;
   var _skipped = 0;
+  var _retries = 0;
   var _revealed = false;
   var _loading = true;
   var _grading = false;
   List<bool>? _hits;
-  final _counts = <ReviewGrade, int>{
-    ReviewGrade.no: 0,
-    ReviewGrade.almost: 0,
-    ReviewGrade.yes: 0,
-  };
+  var _solved = 0;
 
   bool get _done => !_loading && _index >= _queue.length;
 
@@ -72,19 +70,19 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
   @override
   void dispose() {
     _focusNode.dispose();
-    for (final input in _inputs) {
-      input.dispose();
-    }
     super.dispose();
   }
 
   Future<void> _load() async {
-    final queue = await context.read<MemoController>().dueFacts(
-          limit: widget.limit,
+    final limit = widget.limit;
+    final pool = await context.read<MemoController>().dueFacts(
+          limit: limit < 50 ? 50 : limit,
           clozeOnly: true,
         );
     if (!mounted) return;
+    final queue = pool.take(limit).toList();
     setState(() {
+      _pool = pool;
       _queue = queue;
       _loading = false;
     });
@@ -92,12 +90,26 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
   }
 
   void _armCard(Fact fact) {
-    for (final input in _inputs) {
-      input.dispose();
+    final answers = Cloze.blanks(fact.clozeText);
+    final sameDeck = <String>[];
+    final others = <String>[];
+    for (final item in _pool) {
+      if (item.id == fact.id) continue;
+      final words = [...Cloze.blanks(item.clozeText), ...item.distractors];
+      if (item.deckId == fact.deckId) {
+        sameDeck.addAll(words);
+      } else {
+        others.addAll(words);
+      }
     }
-    _inputs = [
-      for (var i = 0; i < Cloze.blanks(fact.clozeText).length; i++) TextEditingController(),
-    ];
+    _pick = ClozePick(
+      answers: answers,
+      bank: ClozeBank.chips(
+        answers: answers,
+        distractors: fact.distractors,
+        extras: [...sameDeck, ...others],
+      ),
+    );
     _revealed = false;
     _hits = null;
   }
@@ -106,42 +118,63 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
     if (!_focusNode.hasFocus) _focusNode.requestFocus();
   }
 
+  void _tapBank(int unusedIndex) {
+    if (_done || _grading || _revealed || _pick == null) return;
+    setState(() => _pick!.tapBank(unusedIndex));
+    _keepFocus();
+    if (_pick!.complete) _check();
+  }
+
+  void _tapSlot(int index) {
+    if (_done || _grading || _revealed || _pick == null) return;
+    setState(() => _pick!.tapSlot(index));
+    _keepFocus();
+  }
+
   void _check() {
-    if (_done || _grading || _revealed || _queue.isEmpty) return;
-    final expected = Cloze.blanks(_queue[_index].clozeText);
-    if (expected.isEmpty) return;
+    final pick = _pick;
+    if (_done || _grading || _revealed || pick == null || !pick.complete) return;
     setState(() {
-      _hits = [
-        for (var i = 0; i < expected.length; i++)
-          i < _inputs.length && Cloze.same(expected[i], _inputs[i].text),
-      ];
+      _hits = pick.hits();
       _revealed = true;
     });
     _keepFocus();
   }
 
-  Future<void> _grade(ReviewGrade grade) async {
-    if (_grading || _done || !_revealed || _queue.isEmpty) return;
+  Future<void> _continue() async {
+    if (_grading || _done || !_revealed) return;
+    final hits = _hits;
+    if (hits == null || hits.isEmpty) return;
+    await _advance(solved: hits.every((item) => item));
+  }
+
+  Future<void> _advance({required bool solved}) async {
+    if (_queue.isEmpty) return;
     setState(() => _grading = true);
     final fact = _queue[_index];
-    final controller = context.read<MemoController>();
-    final previous = await controller.grade(fact.id, grade);
+    ReviewState? previous;
+    if (solved) {
+      previous = await context.read<MemoController>().grade(fact.id, ReviewGrade.yes);
+    }
     if (!mounted) return;
-    var requeued = false;
     final nextQueue = [..._queue];
-    if ((grade == ReviewGrade.no || grade == ReviewGrade.almost) && !_requeuedIds.contains(fact.id)) {
+    var requeued = false;
+    if (!solved) {
       nextQueue.add(fact);
-      _requeuedIds.add(fact.id);
       requeued = true;
     }
     _undoStack.add(
-      _UndoEntry(index: _index, fact: fact, previous: previous, grade: grade, requeued: requeued),
+      _UndoEntry(index: _index, fact: fact, previous: previous, solved: solved, requeued: requeued),
     );
     final nextIndex = _index + 1;
     setState(() {
       _queue = nextQueue;
-      _counts[grade] = (_counts[grade] ?? 0) + 1;
       _index = nextIndex;
+      if (solved) {
+        _solved += 1;
+      } else {
+        _retries += 1;
+      }
       _grading = false;
     });
     if (nextIndex < nextQueue.length) _armCard(nextQueue[nextIndex]);
@@ -151,20 +184,33 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
   Future<void> _undo() async {
     if (_undoStack.isEmpty || _grading) return;
     final entry = _undoStack.removeLast();
-    await context.read<MemoController>().restoreReview(entry.fact.id, entry.previous);
+    if (entry.solved) {
+      await context.read<MemoController>().restoreReview(entry.fact.id, entry.previous);
+    }
     if (!mounted) return;
     final nextQueue = [..._queue];
     if (entry.requeued && nextQueue.isNotEmpty) {
       nextQueue.removeLast();
-      _requeuedIds.remove(entry.fact.id);
     }
     setState(() {
       _queue = nextQueue;
       _index = entry.index;
-      _counts[entry.grade] = ((_counts[entry.grade] ?? 1) - 1).clamp(0, 999);
+      if (entry.solved) {
+        _solved = (_solved - 1).clamp(0, 999);
+      } else {
+        _retries = (_retries - 1).clamp(0, 999);
+      }
     });
     _armCard(entry.fact);
     _keepFocus();
+  }
+
+  void _onEnter() {
+    if (_revealed) {
+      _continue();
+      return;
+    }
+    _check();
   }
 
   void _skip() {
@@ -210,14 +256,8 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
     final flagged = !_done && _queue.isNotEmpty && _queue[_index].flagged;
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.enter): _check,
-        const SingleActivator(LogicalKeyboardKey.numpadEnter): _check,
-        const SingleActivator(LogicalKeyboardKey.digit1): () => _grade(ReviewGrade.no),
-        const SingleActivator(LogicalKeyboardKey.numpad1): () => _grade(ReviewGrade.no),
-        const SingleActivator(LogicalKeyboardKey.digit2): () => _grade(ReviewGrade.almost),
-        const SingleActivator(LogicalKeyboardKey.numpad2): () => _grade(ReviewGrade.almost),
-        const SingleActivator(LogicalKeyboardKey.digit3): () => _grade(ReviewGrade.yes),
-        const SingleActivator(LogicalKeyboardKey.numpad3): () => _grade(ReviewGrade.yes),
+        const SingleActivator(LogicalKeyboardKey.enter): _onEnter,
+        const SingleActivator(LogicalKeyboardKey.numpadEnter): _onEnter,
         const SingleActivator(LogicalKeyboardKey.keyS): _skip,
         const SingleActivator(LogicalKeyboardKey.keyZ): _undo,
         const SingleActivator(LogicalKeyboardKey.keyZ, control: true): _undo,
@@ -265,7 +305,7 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
 
   Widget _buildCard() {
     final fact = _queue[_index];
-    final blanks = Cloze.blanks(fact.clozeText);
+    final pick = _pick!;
     final allHit = _hits != null && _hits!.isNotEmpty && _hits!.every((item) => item);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -280,49 +320,50 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
+                const Text(
                   'HUECO',
                   style: TextStyle(
                     fontSize: 12,
                     letterSpacing: 1.2,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFFB45309),
+                    color: Color(0xFFB45309),
                   ),
                 ),
                 const SizedBox(height: 12),
-                _ClozeSentence(template: fact.clozeText, hits: _hits),
+                _ClozeSentence(
+                  template: fact.clozeText,
+                  slots: pick.slots,
+                  hits: _hits,
+                  activeSlot: _revealed ? null : pick.activeSlot,
+                  onSlotTap: _revealed ? null : _tapSlot,
+                ),
                 const SizedBox(height: 20),
-                if (!_revealed)
-                  for (var i = 0; i < blanks.length; i++) ...[
-                    TextField(
-                      controller: _inputs[i],
-                      autofocus: i == 0,
-                      textInputAction: i == blanks.length - 1 ? TextInputAction.done : TextInputAction.next,
-                      textCapitalization: TextCapitalization.sentences,
-                      onSubmitted: (_) {
-                        if (i == blanks.length - 1) {
-                          _check();
-                        }
-                      },
-                      decoration: InputDecoration(
-                        labelText: blanks.length == 1 ? 'Dato que falta' : 'Hueco ${i + 1}',
-                        hintText: 'Escríbelo y pulsa Intro',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                  ]
-                else ...[
+                if (_revealed) ...[
                   Text(
-                    allHit ? 'Coincide. 1 No · 2 Casi · 3 Sí.' : 'Comprueba el dato y califica.',
+                    allHit ? 'Correcto.' : 'No es correcto. Esta frase volverá a salir.',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: allHit ? AppTheme.primary : const Color(0xFFB45309),
+                      color: allHit ? AppTheme.primary : const Color(0xFFB91C1C),
                     ),
                   ),
                   if (fact.explanation.trim().isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Text(fact.explanation, style: TextStyle(color: AppTheme.muted(context, 0.72), height: 1.4)),
                   ],
+                ] else ...[
+                  Text(
+                    pick.complete ? 'Comprobando…' : 'Toca una palabra para rellenar el hueco.',
+                    style: TextStyle(color: AppTheme.muted(context), fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (var i = 0; i < pick.unused.length; i++)
+                        _BankChip(text: pick.unused[i], onTap: () => _tapBank(i)),
+                    ],
+                  ),
                 ],
                 if (fact.source.isNotEmpty || _deckLabel(fact) != null) ...[
                   const SizedBox(height: 16),
@@ -337,50 +378,10 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        if (!_revealed)
+        if (_revealed)
           FilledButton(
-            onPressed: _grading ? null : _check,
-            child: const Text('Comprobar'),
-          )
-        else
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton(
-                  onPressed: _grading ? null : () => _grade(ReviewGrade.no),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFB91C1C),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('No  1'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _grading ? null : () => _grade(ReviewGrade.almost),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFB45309),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('Casi  2'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _grading ? null : () => _grade(ReviewGrade.yes),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('Sí  3'),
-                ),
-              ),
-            ],
+            onPressed: _grading ? null : _continue,
+            child: const Text('Continuar'),
           ),
       ],
     );
@@ -403,9 +404,9 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
           const SizedBox(height: 8),
           Text(
             [
-              '${_queue.length} en cola',
+              '$_solved acertadas',
+              if (_retries > 0) '$_retries se repetirán hasta acertarlas',
               if (_skipped > 0) '$_skipped saltadas',
-              'los No y Casi vuelven mañana (y una vez más en esta sesión)',
             ].join(' · '),
             textAlign: TextAlign.center,
           ),
@@ -421,10 +422,19 @@ class _ClozeSessionScreenState extends State<ClozeSessionScreen> {
 }
 
 class _ClozeSentence extends StatelessWidget {
-  const _ClozeSentence({required this.template, this.hits});
+  const _ClozeSentence({
+    required this.template,
+    required this.slots,
+    this.hits,
+    this.activeSlot,
+    this.onSlotTap,
+  });
 
   final String template;
+  final List<String?> slots;
   final List<bool>? hits;
+  final int? activeSlot;
+  final ValueChanged<int>? onSlotTap;
 
   @override
   Widget build(BuildContext context) {
@@ -436,15 +446,19 @@ class _ClozeSentence extends StatelessWidget {
         spans.add(TextSpan(text: part.value));
         continue;
       }
-      final hit = hits == null || blank >= hits!.length ? null : hits![blank];
+      final index = blank;
+      final hit = hits == null || index >= hits!.length ? null : hits![index];
+      final placed = index < slots.length ? slots[index] : null;
       blank += 1;
       spans.add(
         WidgetSpan(
           alignment: PlaceholderAlignment.baseline,
           baseline: TextBaseline.alphabetic,
           child: _BlankChip(
-            text: hits == null ? '______' : part.value,
+            text: placed ?? '______',
             hit: hit,
+            selected: activeSlot == index,
+            onTap: onSlotTap == null ? null : () => onSlotTap!(index),
           ),
         ),
       );
@@ -464,10 +478,17 @@ class _ClozeSentence extends StatelessWidget {
 }
 
 class _BlankChip extends StatelessWidget {
-  const _BlankChip({required this.text, this.hit});
+  const _BlankChip({
+    required this.text,
+    this.hit,
+    this.selected = false,
+    this.onTap,
+  });
 
   final String text;
   final bool? hit;
+  final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -476,17 +497,52 @@ class _BlankChip extends StatelessWidget {
       false => const Color(0xFFB91C1C),
       null => const Color(0xFFB45309),
     };
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-        border: Border(bottom: BorderSide(color: color, width: 2)),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: selected ? 0.22 : 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border(
+            bottom: BorderSide(color: color, width: selected ? 3 : 2),
+          ),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 20),
+        ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 20),
+    );
+  }
+}
+
+class _BankChip extends StatelessWidget {
+  const _BankChip({required this.text, required this.onTap});
+
+  final String text;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.card(context),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+        ),
       ),
     );
   }

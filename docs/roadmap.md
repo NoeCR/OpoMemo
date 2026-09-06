@@ -33,18 +33,18 @@ Hecho en **0.4.0**: tema claro / oscuro / sistema, chips cortos (LTAIBG, TREBEP,
 | Modo | Orden | Listo cuando |
 |---|---|---|
 | Huecos | 2.º (leyes) | Listo en **0.5.0**. El hecho tiene un dato tapable (`{{dato}}`). |
-| Relacionar | 3.º | Hechos cortos término ↔ definición. Toque-toque, no flechas. |
+| Relacionar | 3.º | Listo en **Unreleased**. Hechos cortos término ↔ definición. Toque-toque, no flechas. |
 | Verdadero / falso | 4.º | Distractores de OpoTest o trampas redactadas a mano. |
 
-Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Huecos adelanta el due en tarjetas. Relacionar sigue cerrado.
+Contrato de datos a añadir en `Fact`: `kind` (termino / pregunta / hueco), `clozeText`, `distractors[]`, fuente con ley + artículo. Un `ReviewState` único: un fallo en Huecos o Relacionar adelanta el due en tarjetas. Verdadero/falso sigue cerrado.
 
 ## Contenido
 
-Catálogo activo: markdown de **Ley 19/2013**, **TREBEP**, **Ley 30/1984** y **Ley 53/1984**, más mazos atómicos **LPACAP · Plazos** y **CE · Órganos** para Huecos. OpoTest y Redes siguen archivados.
+Catálogo activo: markdown de **Ley 19/2013**, **TREBEP**, **Ley 30/1984** y **Ley 53/1984**, mazos atómicos **LPACAP · Plazos** y **CE · Órganos**, y **Informática · Redes** para Relacionar. OpoTest sigue archivado.
 
 Tres capas:
 
-- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE). Oro para Huecos y Relacionar. Sembrados en **0.5.0**.
+- **A · Atómica** — 30–50 hechos a mano (plazos LPACAP, órganos CE, Redes). Oro para Huecos y Relacionar. Sembrados.
 - **B · Importada limpia** — reextraer OpoTest con distractores y artículo; no borrar el SRS de ids `opotest.q.*`.
 - **C · Volumen** — resto de leyes e importador JSON. Cuando el hábito diario exista.
 

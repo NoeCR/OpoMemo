@@ -138,6 +138,15 @@ void main() {
     expect((await repo.factsFor(deck.id)).firstWhere((item) => item.id == fact.id).explanation, contains('cualquier momento'));
   });
 
+  test('dueFacts puede filtrar por tipo de hecho', () async {
+    final deck = await repo.createDeck(name: 'Mixto', description: '', domain: DeckDomain.leyes);
+    await repo.createFact(deckId: deck.id, prompt: 'Pregunta', answer: 'Larga', kind: FactKind.pregunta);
+    await repo.createFact(deckId: deck.id, prompt: 'HTTPS', answer: '443', kind: FactKind.termino);
+    final pairs = await repo.dueFacts(deckId: deck.id, kind: FactKind.termino);
+    expect(pairs, hasLength(1));
+    expect(pairs.single.prompt, 'HTTPS');
+  });
+
   test('el mazo se crea en una sección y se puede mover', () async {
     final deck = await repo.createDeck(
       name: 'Plazos',

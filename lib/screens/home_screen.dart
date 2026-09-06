@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Cada modo usa los mismos mazos. Empieza por tarjetas; el resto se irá abriendo.',
+              'Cada modo usa los mismos mazos. Tarjetas, Huecos y Relacionar ya están listos.',
               style: TextStyle(fontSize: 16, height: 1.35),
             ),
             const SizedBox(height: 16),
@@ -138,6 +138,12 @@ class _ModeCard extends StatelessWidget {
           }
           if (mode.id == StudyModes.cloze) {
             ClozeSessionScreen.open(context);
+            return;
+          }
+          if (mode.id == StudyModes.match) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const HubScreen(mode: HubMode.match)),
+            );
             return;
           }
           showModalBottomSheet<void>(

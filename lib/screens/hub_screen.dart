@@ -10,9 +10,14 @@ import '../widgets/page_frame.dart';
 import 'deck_form_screen.dart';
 import 'deck_screen.dart';
 import 'flip_session_screen.dart';
+import 'match_session_screen.dart';
+
+enum HubMode { flip, match }
 
 class HubScreen extends StatefulWidget {
-  const HubScreen({super.key});
+  const HubScreen({super.key, this.mode = HubMode.flip});
+
+  final HubMode mode;
 
   @override
   State<HubScreen> createState() => _HubScreenState();
@@ -21,6 +26,18 @@ class HubScreen extends StatefulWidget {
 class _HubScreenState extends State<HubScreen> {
   String? _group;
   var _query = '';
+  final _expanded = <String>{};
+
+  bool _isExpanded(DeckGroup group) {
+    if (_query.trim().isNotEmpty) return true;
+    return _expanded.contains(group.name);
+  }
+
+  void _toggleGroup(String name) {
+    setState(() {
+      if (!_expanded.add(name)) _expanded.remove(name);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +54,10 @@ class _HubScreenState extends State<HubScreen> {
           ),
     ].where((group) => group.decks.isNotEmpty).toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Tarjetas')),
-      floatingActionButton: FloatingActionButton.extended(
+      appBar: AppBar(title: Text(widget.mode == HubMode.match ? 'Relacionar' : 'Tarjetas')),
+      floatingActionButton: widget.mode == HubMode.match
+          ? null
+          : FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (_) => DeckFormScreen(initialGroup: _group),
@@ -76,13 +95,17 @@ class _HubScreenState extends State<HubScreen> {
                               _FilterChip(
                                 label: group.chipLabel,
                                 selected: _group == group.name,
-                                onTap: () => setState(() => _group = group.name),
+                                onTap: () => setState(() {
+                                  _group = group.name;
+                                  _expanded.add(group.name);
+                                }),
                               ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         _DailyReviewBar(
                           due: controller.summaries.fold<int>(0, (sum, item) => sum + item.dueCount),
+                          match: widget.mode == HubMode.match,
                         ),
                         const SizedBox(height: 16),
                         if (groups.isEmpty)
@@ -98,12 +121,12 @@ class _HubScreenState extends State<HubScreen> {
                           )
                         else
                           for (final group in groups) ...[
-                            _GroupHeader(group: group),
-                            const SizedBox(height: 10),
-                            for (final summary in group.decks) ...[
-                              _DeckTile(summary: summary),
-                              const SizedBox(height: 10),
-                            ],
+                            _GroupSection(
+                              group: group,
+                              expanded: _isExpanded(group),
+                              onToggle: () => _toggleGroup(group.name),
+                              match: widget.mode == HubMode.match,
+                            ),
                             const SizedBox(height: 12),
                           ],
                       ],
@@ -115,9 +138,10 @@ class _HubScreenState extends State<HubScreen> {
 }
 
 class _DailyReviewBar extends StatelessWidget {
-  const _DailyReviewBar({required this.due});
+  const _DailyReviewBar({required this.due, this.match = false});
 
   final int due;
+  final bool match;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +157,9 @@ class _DailyReviewBar extends StatelessWidget {
           ),
         ),
         FilledButton(
-          onPressed: due == 0 ? null : () => FlipSessionScreen.open(context),
+          onPressed: due == 0
+              ? null
+              : () => match ? MatchSessionScreen.open(context) : FlipSessionScreen.open(context),
           child: const Text('Repaso del día'),
         ),
       ],
@@ -162,46 +188,83 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _GroupHeader extends StatelessWidget {
-  const _GroupHeader({required this.group});
+class _GroupSection extends StatelessWidget {
+  const _GroupSection({
+    required this.group,
+    required this.expanded,
+    required this.onToggle,
+    this.match = false,
+  });
 
   final DeckGroup group;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final bool match;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: Text(
-            group.name,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-          ),
-        ),
-        Text(
-          '${group.decks.length} mazos · ${group.dueCount} hoy',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.muted(context, 0.45),
-          ),
-        ),
-        IconButton(
-          tooltip: 'Nuevo mazo en ${group.name}',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => DeckFormScreen(initialGroup: group.name),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    expanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppTheme.muted(context, 0.65),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      group.name,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  Text(
+                    '${group.decks.length} mazos · ${group.dueCount} hoy',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.muted(context, 0.45),
+                    ),
+                  ),
+                  if (!match)
+                    IconButton(
+                      tooltip: 'Nuevo mazo en ${group.name}',
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => DeckFormScreen(initialGroup: group.name),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add),
+                    ),
+                ],
+              ),
             ),
           ),
-          icon: const Icon(Icons.add),
         ),
+        if (expanded) ...[
+          const SizedBox(height: 10),
+          for (final summary in group.decks) ...[
+            _DeckTile(summary: summary, match: match),
+            const SizedBox(height: 10),
+          ],
+        ],
       ],
     );
   }
 }
 
 class _DeckTile extends StatelessWidget {
-  const _DeckTile({required this.summary});
+  const _DeckTile({required this.summary, this.match = false});
 
   final DeckSummary summary;
+  final bool match;
 
   @override
   Widget build(BuildContext context) {
@@ -212,9 +275,15 @@ class _DeckTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => DeckScreen(deckId: deck.id)),
-        ),
+        onTap: () {
+          if (match) {
+            MatchSessionScreen.open(context, deckId: deck.id);
+            return;
+          }
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => DeckScreen(deckId: deck.id)),
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
           child: Row(
@@ -254,7 +323,9 @@ class _DeckTile extends StatelessWidget {
               FilledButton(
                 onPressed: due == 0
                     ? null
-                    : () => FlipSessionScreen.open(context, deckId: deck.id),
+                    : () => match
+                        ? MatchSessionScreen.open(context, deckId: deck.id)
+                        : FlipSessionScreen.open(context, deckId: deck.id),
                 child: Text(due == 0 ? 'Hecho' : 'Repasar'),
               ),
             ],
