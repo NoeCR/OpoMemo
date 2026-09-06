@@ -6,10 +6,21 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] - 2026-09-06
+
+Hechos con aclaración y un catálogo propio, sin tests de OpoTest.
+
 ### Added
 - Modelo de hecho: tipo (término / pregunta / hueco), texto con hueco `{{dato}}` y distractores.
-- Mazo atómico **LPACAP · Plazos** (hechos cortos citados al artículo; listo para Huecos más adelante).
-- Mazo atómico **CE · Órganos** (Corona, Cortes, Gobierno, justicia y Tribunal Constitucional).
+- Aclaración en el dorso de cada carta: contexto extra al voltear (campo opcional al editar).
+- Negrita y cursiva en la respuesta y en la aclaración (`**texto**` / `*texto*`, o los botones al editar).
+- Catálogo semilla de **Ley 19/2013**, **TREBEP** (RDL 5/2015), **Ley 30/1984** y **Ley 53/1984**, importados desde markdown (pregunta → respuesta → truco).
+- Mazos atómicos **LPACAP · Plazos** y **CE · Órganos** (código listo; no se siembran).
+
+### Changed
+- Al arrancar se siembran esos markdown. OpoTest, plazos LPACAP, órganos CE y Redes quedan archivados y los mazos semilla antiguos se retiran.
 
 ---
 

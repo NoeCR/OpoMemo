@@ -21,6 +21,7 @@ void main() {
                 back: const MemoFace(
                   label: 'Respuesta',
                   text: '443',
+                  explanation: 'Puerto por defecto de HTTPS.',
                   tint: Colors.indigo,
                 ),
               );
@@ -34,5 +35,7 @@ void main() {
     await tester.tap(find.text('Puerto HTTPS'));
     await tester.pumpAndSettle();
     expect(find.text('443'), findsOneWidget);
+    expect(find.text('Aclaración'), findsOneWidget);
+    expect(find.text('Puerto por defecto de HTTPS.'), findsOneWidget);
   });
 }

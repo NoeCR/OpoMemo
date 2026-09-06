@@ -120,6 +120,18 @@ class MemoRepository {
     await _database.db.delete('decks', where: 'id = ?', whereArgs: [id]);
   }
 
+  /// Quita mazos `source = seed` que ya no están en el catálogo activo.
+  /// Las cartas y el SRS se borran en cascada.
+  Future<void> deleteSeedDecksNotIn(Set<String> keepIds) async {
+    final rows = await _database.db.query('decks', columns: ['id'], where: "source = 'seed'");
+    for (final row in rows) {
+      final id = row['id']! as String;
+      if (!keepIds.contains(id)) {
+        await deleteDeck(id);
+      }
+    }
+  }
+
   Future<List<Fact>> factsFor(String deckId) async {
     final rows = await _database.db.query(
       'facts',
@@ -138,6 +150,7 @@ class MemoRepository {
     FactKind kind = FactKind.pregunta,
     String clozeText = '',
     List<String> distractors = const [],
+    String explanation = '',
     String? id,
   }) async {
     final now = _clock();
@@ -150,6 +163,7 @@ class MemoRepository {
       kind: kind,
       clozeText: clozeText.trim(),
       distractors: distractors,
+      explanation: explanation.trim(),
       flagged: false,
       createdAt: now,
       updatedAt: now,
@@ -197,6 +211,7 @@ class MemoRepository {
         kind: item.kind,
         clozeText: item.clozeText,
         distractors: item.distractors,
+        explanation: item.explanation,
         flagged: false,
         createdAt: _clock(),
         updatedAt: _clock(),
@@ -206,6 +221,12 @@ class MemoRepository {
         fact.toMap(),
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
+      if (item.explanation.trim().isNotEmpty) {
+        await _database.db.rawUpdate(
+          "UPDATE facts SET explanation = ? WHERE id = ? AND (explanation = '' OR explanation IS NULL)",
+          [item.explanation.trim(), item.id],
+        );
+      }
     }
   }
 

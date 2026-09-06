@@ -313,6 +313,7 @@ class _FlipSessionScreenState extends State<FlipSessionScreen> {
               back: MemoFace(
                 label: reversed ? 'Término' : 'Respuesta',
                 text: reversed ? fact.prompt : fact.answer,
+                explanation: fact.explanation,
                 caption: _caption([
                   if (fact.source.isNotEmpty) fact.source,
                   if (deckLabel != null) deckLabel,

@@ -9,7 +9,7 @@ class AppDatabase {
   AppDatabase(this._db);
 
   static const _fileName = 'opomemo.db';
-  static const schemaVersion = 4;
+  static const schemaVersion = 5;
   final Database _db;
 
   Database get db => _db;
@@ -64,6 +64,7 @@ class AppDatabase {
         kind TEXT NOT NULL DEFAULT 'pregunta',
         cloze_text TEXT NOT NULL DEFAULT '',
         distractors TEXT NOT NULL DEFAULT '[]',
+        explanation TEXT NOT NULL DEFAULT '',
         flagged INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -96,6 +97,9 @@ class AppDatabase {
       await db.execute("ALTER TABLE facts ADD COLUMN kind TEXT NOT NULL DEFAULT 'pregunta'");
       await db.execute("ALTER TABLE facts ADD COLUMN cloze_text TEXT NOT NULL DEFAULT ''");
       await db.execute("ALTER TABLE facts ADD COLUMN distractors TEXT NOT NULL DEFAULT '[]'");
+    }
+    if (from < 5) {
+      await db.execute("ALTER TABLE facts ADD COLUMN explanation TEXT NOT NULL DEFAULT ''");
     }
   }
 

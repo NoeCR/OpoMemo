@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path(r"C:\Users\noecr\OneDrive\Escritorio\Repositories\Flutter\OpoTest\releases\OpoTest-content.json")
-OUT = ROOT / "assets" / "seed" / "opotest_decks.json"
+OUT = ROOT / "assets" / "seed" / "archive" / "opotest_decks.json"
 
 LAWS = {
     "5": {"short": "CE", "group": "Constitución Española", "domain": "leyes"},

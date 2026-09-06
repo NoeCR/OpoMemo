@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/fact.dart';
 import '../state/memo_controller.dart';
+import '../widgets/markup_field.dart';
 import '../widgets/page_frame.dart';
 
 class FactFormScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _FactFormScreenState extends State<FactFormScreen> {
   late final _prompt = TextEditingController(text: widget.existing?.prompt);
   late final _answer = TextEditingController(text: widget.existing?.answer);
   late final _source = TextEditingController(text: widget.existing?.source);
+  late final _explanation = TextEditingController(text: widget.existing?.explanation);
   late final _cloze = TextEditingController(text: widget.existing?.clozeText);
   late final _distractors = TextEditingController(
     text: widget.existing?.distractors.join('\n') ?? '',
@@ -31,6 +33,7 @@ class _FactFormScreenState extends State<FactFormScreen> {
     _prompt.dispose();
     _answer.dispose();
     _source.dispose();
+    _explanation.dispose();
     _cloze.dispose();
     _distractors.dispose();
     super.dispose();
@@ -57,6 +60,7 @@ class _FactFormScreenState extends State<FactFormScreen> {
         kind: _kind,
         clozeText: _cloze.text,
         distractors: _parsedDistractors,
+        explanation: _explanation.text,
       );
     } else {
       await controller.updateFact(
@@ -67,6 +71,7 @@ class _FactFormScreenState extends State<FactFormScreen> {
           kind: _kind,
           clozeText: _cloze.text.trim(),
           distractors: _parsedDistractors,
+          explanation: _explanation.text.trim(),
         ),
       );
     }
@@ -136,13 +141,21 @@ class _FactFormScreenState extends State<FactFormScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            TextField(
+            MarkupField(
               controller: _answer,
               maxLines: 4,
-              textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                 labelText: _kind == FactKind.termino ? 'Definición / dorso' : 'Dorso (respuesta)',
-                hintText: _kind == FactKind.termino ? '1 mes' : '443',
+                hintText: _kind == FactKind.termino ? '**1 mes**' : '**443**',
+              ),
+            ),
+            const SizedBox(height: 8),
+            MarkupField(
+              controller: _explanation,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                labelText: 'Aclaración (al voltear)',
+                hintText: 'El silencio es *positivo* salvo las excepciones del **art. 24.1**.',
               ),
             ),
             if (_kind == FactKind.hueco) ...[

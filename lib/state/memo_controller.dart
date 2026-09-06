@@ -41,12 +41,12 @@ class MemoController extends ChangeNotifier {
     return names;
   }
 
-  Future<void> bootstrap({String? seedJson}) async {
+  Future<void> bootstrap() async {
     loading = true;
     error = null;
     notifyListeners();
     try {
-      await ContentSeed.ensure(_repo, jsonText: seedJson);
+      await ContentSeed.ensure(_repo);
       summaries = await _repo.summaries();
     } catch (e) {
       error = 'No se pudo abrir la base local.';
@@ -99,6 +99,7 @@ class MemoController extends ChangeNotifier {
     FactKind kind = FactKind.pregunta,
     String clozeText = '',
     List<String> distractors = const [],
+    String explanation = '',
   }) async {
     final fact = await _repo.createFact(
       deckId: deckId,
@@ -108,6 +109,7 @@ class MemoController extends ChangeNotifier {
       kind: kind,
       clozeText: clozeText,
       distractors: distractors,
+      explanation: explanation,
     );
     await reload();
     return fact;

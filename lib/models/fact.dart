@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../domain/memo_markup.dart';
+
 enum FactKind {
   termino,
   pregunta,
@@ -31,6 +33,7 @@ class Fact {
     this.kind = FactKind.pregunta,
     this.clozeText = '',
     this.distractors = const [],
+    this.explanation = '',
     this.flagged = false,
   });
 
@@ -42,6 +45,7 @@ class Fact {
   final FactKind kind;
   final String clozeText;
   final List<String> distractors;
+  final String explanation;
   final bool flagged;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -52,7 +56,11 @@ class Fact {
     return prompt.toLowerCase().contains(needle) ||
         answer.toLowerCase().contains(needle) ||
         source.toLowerCase().contains(needle) ||
-        clozeText.toLowerCase().contains(needle);
+        clozeText.toLowerCase().contains(needle) ||
+        explanation.toLowerCase().contains(needle) ||
+        MemoMarkup.plain(prompt).toLowerCase().contains(needle) ||
+        MemoMarkup.plain(answer).toLowerCase().contains(needle) ||
+        MemoMarkup.plain(explanation).toLowerCase().contains(needle);
   }
 
   Fact copyWith({
@@ -62,6 +70,7 @@ class Fact {
     FactKind? kind,
     String? clozeText,
     List<String>? distractors,
+    String? explanation,
     bool? flagged,
     DateTime? updatedAt,
   }) {
@@ -74,6 +83,7 @@ class Fact {
       kind: kind ?? this.kind,
       clozeText: clozeText ?? this.clozeText,
       distractors: distractors ?? this.distractors,
+      explanation: explanation ?? this.explanation,
       flagged: flagged ?? this.flagged,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -89,6 +99,7 @@ class Fact {
         'kind': kind.name,
         'cloze_text': clozeText,
         'distractors': jsonEncode(distractors),
+        'explanation': explanation,
         'flagged': flagged ? 1 : 0,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
@@ -104,6 +115,7 @@ class Fact {
       kind: FactKind.fromStorage(map['kind'] as String? ?? 'pregunta'),
       clozeText: map['cloze_text'] as String? ?? '',
       distractors: _readDistractors(map['distractors']),
+      explanation: map['explanation'] as String? ?? '',
       flagged: (map['flagged'] as int? ?? 0) == 1,
       createdAt: DateTime.parse(map['created_at']! as String),
       updatedAt: DateTime.parse(map['updated_at']! as String),
@@ -134,6 +146,7 @@ class SeedFact {
     this.kind = FactKind.pregunta,
     this.clozeText = '',
     this.distractors = const [],
+    this.explanation = '',
   });
 
   final String id;
@@ -143,4 +156,5 @@ class SeedFact {
   final FactKind kind;
   final String clozeText;
   final List<String> distractors;
+  final String explanation;
 }

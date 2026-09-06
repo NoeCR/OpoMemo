@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/deck.dart';
 import '../models/fact.dart';
+import '../domain/memo_markup.dart';
 import '../state/memo_controller.dart';
 import '../widgets/leitner_strip.dart';
 import '../widgets/memo_search_field.dart';
@@ -214,7 +215,7 @@ class _DeckScreenState extends State<DeckScreen> {
                           subtitle: Text(
                             [
                               fact.kind.label,
-                              fact.answer,
+                              MemoMarkup.plain(fact.answer),
                               if (fact.source.isNotEmpty) fact.source,
                             ].join(' · '),
                             maxLines: 2,

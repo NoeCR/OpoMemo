@@ -127,6 +127,17 @@ void main() {
     expect(stored.distractors, ['6 meses', '1 mes']);
   });
 
+  test('el hecho guarda la aclaración del dorso', () async {
+    final deck = await repo.createDeck(name: 'Plazos', description: '', domain: DeckDomain.leyes);
+    final fact = await repo.createFact(
+      deckId: deck.id,
+      prompt: 'Plazo de alzada (acto expreso)',
+      answer: '1 mes',
+      explanation: 'Si el acto no es expreso, cabe en cualquier momento.',
+    );
+    expect((await repo.factsFor(deck.id)).firstWhere((item) => item.id == fact.id).explanation, contains('cualquier momento'));
+  });
+
   test('el mazo se crea en una sección y se puede mover', () async {
     final deck = await repo.createDeck(
       name: 'Plazos',

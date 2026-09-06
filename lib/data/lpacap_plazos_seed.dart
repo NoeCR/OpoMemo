@@ -2,6 +2,7 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import 'memo_repository.dart';
 
+/// Archivado: no se carga en [ContentSeed]. Conservado por si se reactiva.
 /// Hechos cortos de plazos de la Ley 39/2015. Citas del BOE-A-2015-10565.
 abstract final class LpacapPlazosSeed {
   static const deckId = 'atomic.lpacap.plazos';
@@ -25,6 +26,7 @@ abstract final class LpacapPlazosSeed {
     FactKind kind = FactKind.hueco,
     String? cloze,
     List<String> distractors = const [],
+    String explanation = '',
   }) {
     return SeedFact(
       id: '$deckId.$id',
@@ -34,6 +36,7 @@ abstract final class LpacapPlazosSeed {
       kind: kind,
       clozeText: cloze ?? '',
       distractors: distractors,
+      explanation: explanation,
     );
   }
 
@@ -53,6 +56,7 @@ abstract final class LpacapPlazosSeed {
       article: '21.3',
       cloze: 'Cuando las normas no fijen el plazo máximo, éste será de {{3 meses}}.',
       distractors: const ['6 meses', '10 días'],
+      explanation: 'Es el plazo supletorio. Si la norma del procedimiento fija otro, rige ese, con el tope de 6 meses del art. 21.2.',
     ),
     _item(
       id: '21-3-oficio',
@@ -82,6 +86,7 @@ abstract final class LpacapPlazosSeed {
       article: '24.1',
       kind: FactKind.termino,
       distractors: const ['Desestimatorio', 'Caducidad'],
+      explanation: 'Regla general a solicitud del interesado. El silencio es desestimatorio en petición (art. 29 CE), dominio o servicio público, medio ambiente, responsabilidad patrimonial, impugnación y revisión de oficio.',
     ),
     _item(
       id: '24-1-negativo',
@@ -307,6 +312,7 @@ abstract final class LpacapPlazosSeed {
       article: '122.1',
       cloze: 'El recurso de alzada se interpone en el plazo de {{1 mes}} si el acto fuera expreso.',
       distractors: const ['3 meses', '15 días'],
+      explanation: 'Si el acto no es expreso, puede interponerse en cualquier momento desde el día siguiente a los efectos del silencio (art. 122.1).',
     ),
     _item(
       id: '122-1-silencio',

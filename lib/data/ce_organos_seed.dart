@@ -2,6 +2,7 @@ import '../models/deck.dart';
 import '../models/fact.dart';
 import 'memo_repository.dart';
 
+/// Archivado: no se carga en [ContentSeed]. Conservado por si se reactiva.
 /// Órganos constitucionales. Citas del BOE-A-1978-31229 (texto consolidado).
 abstract final class CeOrganosSeed {
   static const deckId = 'atomic.ce.organos';
@@ -25,6 +26,7 @@ abstract final class CeOrganosSeed {
     FactKind kind = FactKind.termino,
     String? cloze,
     List<String> distractors = const [],
+    String explanation = '',
   }) {
     return SeedFact(
       id: '$deckId.$id',
@@ -34,6 +36,7 @@ abstract final class CeOrganosSeed {
       kind: kind,
       clozeText: cloze ?? '',
       distractors: distractors,
+      explanation: explanation,
     );
   }
 
@@ -75,6 +78,7 @@ abstract final class CeOrganosSeed {
       article: '66.1',
       kind: FactKind.hueco,
       cloze: 'Las Cortes Generales están formadas por el {{Congreso de los Diputados}} y el {{Senado}}.',
+      explanation: 'Las Cortes Generales son inviolables (art. 66.3). Nadie puede ser miembro de las dos Cámaras a la vez (art. 67.1).',
     ),
     _item(
       id: '66-2-funciones',
@@ -292,6 +296,7 @@ abstract final class CeOrganosSeed {
       article: '159.1',
       kind: FactKind.hueco,
       cloze: 'El TC se compone de {{12}} miembros: {{4}} a propuesta del Congreso, {{4}} del Senado, {{2}} del Gobierno y {{2}} del CGPJ.',
+      explanation: 'Todos los nombra el Rey. Congreso y Senado eligen por mayoría de tres quintos. El mandato es de 9 años (art. 159.3).',
     ),
     _item(
       id: '159-3-mandato',

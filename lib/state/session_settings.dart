@@ -40,12 +40,13 @@ Future<void> showSessionSizePicker(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) {
       return ListenableBuilder(
         listenable: settings,
         builder: (context, _) {
           return SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

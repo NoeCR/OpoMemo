@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../domain/memo_markup.dart';
+
 class FlipCard extends StatefulWidget {
   const FlipCard({
     super.key,
@@ -79,16 +81,19 @@ class MemoFace extends StatelessWidget {
     required this.label,
     required this.text,
     this.caption,
+    this.explanation,
     required this.tint,
   });
 
   final String label;
   final String text;
   final String? caption;
+  final String? explanation;
   final Color tint;
 
   @override
   Widget build(BuildContext context) {
+    final note = explanation?.trim() ?? '';
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(minHeight: 280),
@@ -105,40 +110,84 @@ class MemoFace extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              fontSize: 12,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w800,
-              color: tint,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              height: 1.25,
-            ),
-          ),
-          if (caption != null && caption!.isNotEmpty) ...[
-            const SizedBox(height: 16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
             Text(
-              caption!,
-              textAlign: TextAlign.center,
+              label.toUpperCase(),
               style: TextStyle(
-                color: Colors.black.withValues(alpha: 0.45),
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w800,
+                color: tint,
               ),
             ),
+            const SizedBox(height: 18),
+            Text.rich(
+              MemoMarkup.toSpan(
+                text,
+                const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  color: Color(0xFF111827),
+                ),
+                accent: tint,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (note.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                decoration: BoxDecoration(
+                  color: tint.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Aclaración',
+                      style: TextStyle(
+                        fontSize: 11,
+                        letterSpacing: 0.8,
+                        fontWeight: FontWeight.w800,
+                        color: tint,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text.rich(
+                      MemoMarkup.toSpan(
+                        note,
+                        TextStyle(
+                          fontSize: 16,
+                          height: 1.4,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black.withValues(alpha: 0.72),
+                        ),
+                        accent: tint,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            if (caption != null && caption!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                caption!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
